@@ -1,0 +1,81 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --fondo: #fff;
+    --fondo2: rgba(212, 211, 211, 0.418);
+    --fondo3: rgba(201, 200, 200, 0.507);
+    --texto: #000;
+    --border-input: rgba(0, 0, 0, 0.582);
+    --border-input-focus: #333;
+}
+
+.dark {
+    --fondo: #333;
+    --fondo2: rgba(71, 71, 71, 0.418);
+    --fondo2: rgba(82, 81, 81, 0.400);
+    --texto: #fff;
+    --border-input: rgba(255, 255, 255, 0.582);
+    --border-input-focus: #fff;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    background: var(--fondo);
+}
+
+.contenedor {
+    color: var(--texto);
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenedor .contenido {
+    min-width: 250px;
+    background: var(--fondo2);
+    padding: 30px 40px;
+}
+
+.contenedor .contenido h1 {
+    font-family: Arial;
+    text-align: center;
+}
+
+input[type="text"], input[type="password"] {
+    display: block;
+    border: none;
+    margin: 20px 0;
+    width: 100%;
+    height: 25px;
+    border: none;
+    border-bottom: 0.5px solid var(--border-input);
+    background: none;
+    color: var(--texto);
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-bottom: 1px solid var(--border-input-focus);
+}
+
+input:focus {
+    outline: none;
+}
+
+button {
+    background: var(--fondo3);
+    width: 100%;
+    border: none;
+    padding: 5px 0;
+    color: var(--texto);
+}
+
+button:hover {
+    cursor: pointer;
+}
