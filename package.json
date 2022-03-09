@@ -1,5 +1,6 @@
 {
   "name": "chat-tiempo-real",
+  "homepage": "https://alexgv1108.github.io/chat-tiempo-real/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
