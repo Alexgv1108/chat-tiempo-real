@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/chat-tiempo-real/static/css/main.4ad6e93d.css",
+    "main.js": "/chat-tiempo-real/static/js/main.074a5f6f.js",
+    "index.html": "/chat-tiempo-real/index.html",
+    "main.4ad6e93d.css.map": "/chat-tiempo-real/static/css/main.4ad6e93d.css.map",
+    "main.074a5f6f.js.map": "/chat-tiempo-real/static/js/main.074a5f6f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4ad6e93d.css",
+    "static/js/main.074a5f6f.js"
+  ]
+}
