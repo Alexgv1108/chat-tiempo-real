@@ -79,3 +79,26 @@ button {
 button:hover {
     cursor: pointer;
 }
+
+.is-error {
+    transition: background-color 0.5s linear;
+}
+
+.is-error.show {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 12px 3px;
+    text-align: center;
+    background: rgba(248, 203, 2, 0.473);
+}
+
+.is-error.hide {
+    background: transparent;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

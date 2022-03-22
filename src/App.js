@@ -6,9 +6,9 @@ import NotFound from './components/NotFound';
 
 const App = () => {
   return (
-    <Router> 
+    <Router basename={process.env.PUBLIC_URL}> 
       <Routes>
-        <Route exact path="/" element={<Login />} asename={process.env.PUBLIC_URL}/>
+        <Route exact path="/" element={<Login />}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
