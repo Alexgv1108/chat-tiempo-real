@@ -19,6 +19,7 @@ class Main extends React.Component {
         if (!localStorage.getItem('fondoDark')) {
             localStorage.setItem('fondoDark', false)
         }
+        document.body.className = this.state.fondoDark ? this.DARK_STYLE : this.LIGHT_STYLE;
     }
 
     functionesGlobales = funcionEjecutar => {
