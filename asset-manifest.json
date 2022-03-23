@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/chat-tiempo-real/static/css/main.c9cebffd.css",
-    "main.js": "/chat-tiempo-real/static/js/main.ea8e5820.js",
+    "main.js": "/chat-tiempo-real/static/js/main.9978cf27.js",
     "static/media/loading.svg": "/chat-tiempo-real/static/media/loading.05cd0cc4aea10436ba482c331310ac6a.svg",
     "index.html": "/chat-tiempo-real/index.html",
     "main.c9cebffd.css.map": "/chat-tiempo-real/static/css/main.c9cebffd.css.map",
-    "main.ea8e5820.js.map": "/chat-tiempo-real/static/js/main.ea8e5820.js.map"
+    "main.9978cf27.js.map": "/chat-tiempo-real/static/js/main.9978cf27.js.map"
   },
   "entrypoints": [
     "static/css/main.c9cebffd.css",
-    "static/js/main.ea8e5820.js"
+    "static/js/main.9978cf27.js"
   ]
 }
