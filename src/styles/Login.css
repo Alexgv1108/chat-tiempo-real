@@ -10,6 +10,7 @@
     --texto: #000;
     --border-input: rgba(0, 0, 0, 0.582);
     --border-input-focus: #333;
+    font-family: Arial;
 }
 
 .dark {
@@ -44,7 +45,6 @@ body {
 }
 
 .contenedor .contenido h1 {
-    font-family: Arial;
     text-align: center;
 }
 
@@ -68,12 +68,17 @@ input:focus {
     outline: none;
 }
 
+input, p, a {
+    font-size: 13px;
+}
+
 button {
     background: var(--fondo3);
     width: 100%;
     border: none;
     padding: 5px 0;
     color: var(--texto);
+    margin-top: 10px;
 }
 
 button:hover {
@@ -85,11 +90,11 @@ button:hover {
 }
 
 .is-error.show {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 12px;
+    margin-bottom: 8px;
     padding: 12px 3px;
     text-align: center;
-    background: rgba(248, 203, 2, 0.473);
+    background: rgba(248, 203, 2, 0.356);
 }
 
 .is-error.hide {
@@ -101,4 +106,9 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+a {
+    text-decoration: none;
+    color: var(--texto);
 }

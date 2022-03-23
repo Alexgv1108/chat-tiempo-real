@@ -1,17 +1,18 @@
 import React from "react";
 
-import LoginUsuario from '../components/LoginUsuario';
+import CreateUser from '../components/CreateUser';
 
 import Users from '../database/users.json';
 
-class Login extends React.Component {
+class Create extends React.Component {
+
     state = {
-        error: null,
+        error: null
     };
 
-    iniciarSesion = async (username, password) => {
-        await this.props.globalFunct('setLoading');
+    createUser = async (username, password) => {
         clearInterval(this.intervalId);
+        await this.props.globalFunct('setLoading');
         const usuarios = await Users;
         const credencialesCorrectas = usuarios.some(user => {
             return user.username === username && user.password === password;
@@ -38,14 +39,15 @@ class Login extends React.Component {
 
     render() {
         return (
-            <LoginUsuario
+            <CreateUser
                 globalFunct={this.props.globalFunct}
-                iniciarSesion={this.iniciarSesion}
+                createUser={this.createUser}
                 error={this.state.error}
                 loading={this.props.global.loading}
             />
-        );
+        )
     }
+
 }
 
-export default Login;
+export default Create;

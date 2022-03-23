@@ -5,8 +5,7 @@ import '../styles/Login.css';
 
 import Loading from '../images/loading.svg';
 
-
-const LoginRenderizar = props => {
+const CreateUser = props => {
     
     const MSG_ERROR_TRUE = 'is-error show';
     const MSG_ERROR_FALSE = 'is-error hide';
@@ -26,7 +25,7 @@ const LoginRenderizar = props => {
         <div className="contenedor">
             <div className="contenido">
                 <form>
-                    <h1 onClick={() => { props.globalFunct('cambiarFondo'); }}>Iniciar sesión</h1>
+                    <h1 onClick={() => { props.globalFunct('cambiarFondo'); }}>Crear usuario</h1>
 
                     <input type="text" id="user" name="user" placeholder="Usuario" 
                         value={user} onChange={e => { setUser(e.target.value); } } />
@@ -34,9 +33,9 @@ const LoginRenderizar = props => {
                     <input type="password" id="password" name="password" placeholder="Contraseña"
                         value={ password } onChange={e => { setPassword(e.target.value); } } />
 
-                    <Link to="create-user">Crear usuario</Link>
+                    <Link to="/">Iniciar sesión</Link>
 
-                    <button onClick={() => { props.iniciarSesion(user, password); }}>Iniciar sesión</button>
+                    <button onClick={() => { props.createUser(user, password); }}>Crear usuario</button>
 
                     <div className={props.error ? MSG_ERROR_TRUE : MSG_ERROR_FALSE}>
                         <p>{props.error}</p>
@@ -47,4 +46,4 @@ const LoginRenderizar = props => {
     );
 }
 
-export default LoginRenderizar;
+export default CreateUser;
