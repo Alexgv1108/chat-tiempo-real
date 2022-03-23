@@ -29,6 +29,7 @@ class Main extends React.Component {
                 fondoDark: !this.state.fondoDark   
             });
             document.body.className = this.state.fondoDark ? this.DARK_STYLE : this.LIGHT_STYLE;
+            localStorage.setItem('fondoDark', this.state.fondoDark);
         };
 
         // Alterna el loading de la aplicación
