@@ -83,7 +83,7 @@ export const Chat = () => {
     useEffect(() => {
         if (!usuarioSesion.uid || !uidChat || todosLosRegistrosConsultados) return;
         (async () => {
-            setLoading(true);
+            if (!isCargaCompleta) setLoading(true);
             const pathTo = `${uidChat}/${usuarioSesion.uid}`;
             const pathFrom = `${usuarioSesion.uid}/${uidChat}`;
             const response = await getFullMessageByPath(db, pathFrom, pathTo, pagination ? pagination : null);
@@ -99,7 +99,7 @@ export const Chat = () => {
             const lengArray = dataSort.length;
             const responseArrayMitad = [...dataSort].slice((lengArray / 2) - 1, lengArray - 1)
             setPosts(postState => [...responseArrayMitad, ...postState]);
-            setLoading(false);
+            if (!isCargaCompleta) setLoading(false);
         })();
     }, [uidChat, pagination]);
 
