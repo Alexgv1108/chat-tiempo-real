@@ -39,15 +39,16 @@ export const Login = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+      <div style={{ width: '100%', maxWidth: '350px' }}>
+      <div className="card">
         <div className="card-body">
           <h5 className="card-title text-center">Chat en tiempo Real</h5>
           <button type="submit" className="btn btn-primary w-100 mt-2 d-flex justify-content-center align-items-center" onClick={loginWithGoogle}>
-            Login
-            <FontAwesomeIcon icon={faGoogle} size="2x" color="#3FDFAA" className="ms-2" />
+            Iniciar sesión con Google
           </button>
-
         </div>
+      </div>
+          <p className='text-center fs-6 text-secondary text-opacity-50 mt-2'>Autor: Alexander Gallego Vasquez</p>
       </div>
     </div>
   )
