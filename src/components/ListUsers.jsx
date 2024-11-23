@@ -12,7 +12,7 @@ export const ListUsers = ({ usuarios, uidChat, showUsers, setShowUsers, setUidCh
                 tabIndex="-1"
                 style={{
                     visibility: showUsers ? "visible" : "hidden",
-                    zIndex: "9999"
+                    zIndex: "8888"
                 }}
             >
                 <div className="offcanvas-header">
