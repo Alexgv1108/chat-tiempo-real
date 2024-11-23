@@ -1,7 +1,7 @@
-import { endAt, get, limitToLast, orderByChild, query, ref } from "firebase/database";
+import { endBefore, get, limitToLast, orderByChild, query, ref } from "firebase/database";
 import Swal from "sweetalert2";
 
-const CANTIDAD_MENSAJES = 4;
+const CANTIDAD_MENSAJES = 8;
 const getMessages = postsRef => {
     try {
         return get(postsRef);
@@ -25,8 +25,9 @@ export const getMessagesByPathAndPagination = async (db, path, datePagination) =
     const postsRef = query(
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
+        endBefore(datePagination),
         limitToLast(CANTIDAD_MENSAJES),
-        endAt(datePagination),
+        
     );
     
     return getMessages(postsRef);

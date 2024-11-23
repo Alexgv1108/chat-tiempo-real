@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseAuth } from "../firebase/config";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { memo } from "react";
 
 
-export const Navbar = ({ showUsers, setShowUsers }) => {
-
+export const Navbar = memo(({ showUsers, setShowUsers }) => {
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
@@ -21,7 +21,8 @@ export const Navbar = ({ showUsers, setShowUsers }) => {
                     height: "60px",
                     margin: "0",
                     padding: "0",
-                    position: "absolute"
+                    position: "absolute",
+                    zIndex: '8888'
                 }}>
                 <div className="container-fluid">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
@@ -48,4 +49,4 @@ export const Navbar = ({ showUsers, setShowUsers }) => {
             </button>
         </>
     )
-}
+})
