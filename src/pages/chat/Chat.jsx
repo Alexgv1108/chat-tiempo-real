@@ -3,8 +3,9 @@ import { get, getDatabase, limitToLast, onChildAdded, query, ref } from "firebas
 import { useEffect, useRef, useState } from "react";
 import { Navbar, Loader, ListUsers, InputSendMessage, ContainerMessages } from "../../components/";
 import { useNavigate } from "react-router-dom";
-import { getFullMessageByPath } from "../../helpers/GetMessage";
+import { getFullMessage } from "../../helpers/GetMessage";
 import Swal from "sweetalert2";
+import { constantes } from "../../global/constantes";
 
 const auth = getAuth();
 const db = getDatabase();
@@ -13,6 +14,8 @@ let usuarioSesion = {};
 let ultimaFechaPaginacion = null;
 let isCargaCompleta = false;
 let todosLosRegistrosConsultados = false;
+
+const { CANTIDAD_MENSAJES } = constantes();
 
 export const Chat = () => {
 
@@ -28,6 +31,7 @@ export const Chat = () => {
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState(null);
     const [heighPosicionChat, setHeighPosicionChat] = useState(0);
+    const [pathMessages, setPathMessages] = useState(null);
 
     // Listener para detectar sesión activa
     useEffect(() => {
@@ -48,6 +52,7 @@ export const Chat = () => {
     // Consulta inicial de lista de usuarios registrados
     const getListaUsuarios = async () => {
         if (usuarios.length) return;
+        setLoading(true);
         const postsRef = ref(db, 'usuarios');
         try {
             const snapshot = await get(postsRef);
@@ -57,17 +62,27 @@ export const Chat = () => {
             setUsuarios(postDataFilter);
             setLoading(false);
         } catch (error) {
+            setLoading(false);
             Swal.fire('Ups', 'No se pudieron recuperar la lista de usuarios, por favor intenta de nuevo más tarde', 'warning');
             console.error("Error fetching data:", error);
         }
     }
 
-    // Listener en tiempo real para mensaje
+    // Generación de clave única en relación a los dos chat
     useEffect(() => {
         if (!uidChat || !usuarioSesion.uid) return;
+        const [uidChat1, uidChat2] = [uidChat, usuarioSesion.uid].sort();
+        setPathMessages(`${uidChat1}/${uidChat2}`);
+        setPagination(null);
+    }, [uidChat]);
+
+
+    // Listener en tiempo real para mensaje
+    useEffect(() => {
+        if (!pathMessages || !usuarioSesion.uid) return;
         isCargaCompleta = false;
         todosLosRegistrosConsultados = false;
-        const postsRef = query(ref(db, `/chat/${uidChat}/${usuarioSesion.uid}`), limitToLast(1));
+        const postsRef = query(ref(db, `chat/${pathMessages}`), limitToLast(1));
         const unsubscribe = onChildAdded(postsRef, (snapshot) => {
             const newMessage = snapshot.val();
             if (new Date(newMessage.fecha) > fechaInicioPagina) {
@@ -76,36 +91,33 @@ export const Chat = () => {
             }
         });
 
-        return () => unsubscribe()
-    }, [uidChat]);
+        return () => unsubscribe();
+    }, [pathMessages]);
 
     // Consulta de mensajes al seleccionar un chat
     useEffect(() => {
-        if (!usuarioSesion.uid || !uidChat || todosLosRegistrosConsultados) return;
+        if (!usuarioSesion.uid || !pathMessages || todosLosRegistrosConsultados) return;
         (async () => {
             if (!isCargaCompleta) setLoading(true);
-            const pathTo = `${uidChat}/${usuarioSesion.uid}`;
-            const pathFrom = `${usuarioSesion.uid}/${uidChat}`;
-            const response = await getFullMessageByPath(db, pathFrom, pathTo, pagination ? pagination : null);
-            const responseArray = Object.entries(response);
-
-            if (!responseArray || !responseArray.length) {
+            debugger;
+            const { response } = await getFullMessage(db, pathMessages, pagination ? pagination : null);
+            if (!response) {
                 todosLosRegistrosConsultados = true;
                 setLoading(false);
                 return;
             }
+
+            const responseArray = Object.entries(response);
+
             // ordena por fecha
             const dataSort = responseArray.sort((a, b) => new Date(a[1].fecha) - new Date(b[1].fecha));
-            const lengArray = dataSort.length;
-            const responseArrayMitad = [...dataSort].slice((lengArray / 2) - 1, lengArray - 1)
-            setPosts(postState => [...responseArrayMitad, ...postState]);
+            setPosts(postState => [...dataSort, ...postState]);
             if (!isCargaCompleta) setLoading(false);
         })();
-    }, [uidChat, pagination]);
+    }, [pathMessages, pagination]);
 
     useEffect(() => {
-        if (!chatStartRef.current || !heighPosicionChat || !isCargaCompleta || loading) return;
-        debugger;
+        if (!posts.length || !chatStartRef.current || !heighPosicionChat || !isCargaCompleta || loading) return;
         chatStartRef.current.scrollTo({
             top: heighPosicionChat
         });
@@ -116,7 +128,7 @@ export const Chat = () => {
     useEffect(() => {
         if (loading || !posts.length || !chatEndRef.current || isCargaCompleta || todosLosRegistrosConsultados) return;
         if (!isCargaCompleta) scrollAbajo();
-        if (chatStartRef.current?.scrollTop === 0) {
+        if (chatStartRef.current?.scrollTop === 0 && CANTIDAD_MENSAJES <= posts.length) {
             if (ultimaFechaPaginacion === posts[0][1].fecha) return;
             ultimaFechaPaginacion = posts[0][1].fecha;
             setPagination(ultimaFechaPaginacion);
@@ -134,7 +146,7 @@ export const Chat = () => {
 
     // Evento para cuando se mueve el mouse
     useEffect(() => {
-        if (!uidChat || !posts || loading) return;
+        if (!uidChat || !posts.length || loading) return;
         const container = chatStartRef.current;
         if (container) {
             container.addEventListener('scroll', handleScroll);
@@ -166,6 +178,7 @@ export const Chat = () => {
                         showUsers={showUsers}
                         setShowUsers={setShowUsers}
                         setUidChat={setUidChat}
+                        setPosts={setPosts}
                     />
 
                     {/* Columna derecha: Contenido del chat */}
@@ -193,6 +206,8 @@ export const Chat = () => {
                                 usuarioSesionUid={usuarioSesion.uid}
                                 uidChat={uidChat}
                                 setPosts={setPosts}
+                                pathMessages={pathMessages}
+                                scrollAbajo={scrollAbajo}
                             />
                         )}
                     </div>

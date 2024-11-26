@@ -1,8 +1,10 @@
-export const ListUsers = ({ usuarios, uidChat, showUsers, setShowUsers, setUidChat }) => {
+export const ListUsers = ({ usuarios, uidChat, showUsers, setShowUsers, setUidChat, setPosts }) => {
 
     const handleChatear = uid => {
+        if (uid === uidChat) return;
         setUidChat(uid);
         setShowUsers(false);
+        setPosts([]);
     }
 
     return (
