@@ -1,7 +1,9 @@
 import { endBefore, get, limitToLast, orderByChild, query, ref } from "firebase/database";
 import Swal from "sweetalert2";
+import { constantes } from "../global/constantes";
 
-const CANTIDAD_MENSAJES = 8;
+const { CANTIDAD_MENSAJES } = constantes();
+
 const getMessages = postsRef => {
     try {
         return get(postsRef);
@@ -12,6 +14,7 @@ const getMessages = postsRef => {
 }
 
 export const getMessagesByPath = async (db, path) => {
+    debugger;
     const postsRef = query(
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
@@ -33,13 +36,12 @@ export const getMessagesByPathAndPagination = async (db, path, datePagination) =
     return getMessages(postsRef);
 }
 
-export const getFullMessageByPath = async(db, path, path2, datePagination) => {
+export const getFullMessage = async(db, pathConst, datePagination) => {
     const getMessageFrom = datePagination
-        ? getMessagesByPathAndPagination(db, path, datePagination)
-        : getMessagesByPath(db, path)
-    const getMessageTo = datePagination
-        ? getMessagesByPathAndPagination(db, path2, datePagination)
-        : getMessagesByPath(db, path2)
-    const [messageFrom, messageTo] = await Promise.all([getMessageFrom, getMessageTo]);
-    return { ...messageFrom.val(), ...messageTo.val() };
+        ? await getMessagesByPathAndPagination(db, pathConst || path, datePagination)
+        : await getMessagesByPath(db, pathConst || path);
+
+    return { 
+        response: getMessageFrom.val()
+    };
 }
