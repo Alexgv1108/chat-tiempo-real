@@ -1,56 +1,34 @@
-.spinner {
-   width: 56px;
-   height: 56px;
-   border-radius: 50%;
-   border: 9px solid #474bff;
-   animation: spinner-bulqg1 0.8s infinite linear alternate,
-        spinner-oaa3wk 1.6s infinite linear;
+.container-loader {
+   position: absolute;
+   left: 50%;
+   top: 100px;
+   transform: translate(50%, 50%);
+   text-align: center;
+   z-index: 9999;
+   color: rgb(40, 75, 129);
 }
 
-@keyframes spinner-bulqg1 {
-   0% {
-      clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
-   }
-
-   12.5% {
-      clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%);
-   }
-
-   25% {
-      clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%);
-   }
-
-   50% {
-      clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%);
-   }
-
-   62.5% {
-      clip-path: polygon(50% 50%, 100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%);
-   }
-
-   75% {
-      clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%);
-   }
-
-   100% {
-      clip-path: polygon(50% 50%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%);
-   }
+.loader {
+  width: 48px;
+  height: 48px;
+  background: rgb(40, 75, 129);
+  border-radius: 50%;
+  position: relative;
+  animation: roll 1s ease-in-out infinite alternate;
 }
-
-@keyframes spinner-oaa3wk {
-   0% {
-      transform: scaleY(1) rotate(0deg);
-   }
-
-   49.99% {
-      transform: scaleY(1) rotate(135deg);
-   }
-
-   50% {
-      transform: scaleY(-1) rotate(0deg);
-   }
-
-   100% {
-      transform: scaleY(-1) rotate(-135deg);
-   }
+.loader:after{
+  content:"";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 5px solid ;
+  border-color: #fff transparent;
+}
+@keyframes roll {
+  0% {
+    transform: translateX(-150%) rotate(0deg) ;
+  }
+  100% {
+    transform:  translateX(150%) rotate(360deg);
+  }
 }

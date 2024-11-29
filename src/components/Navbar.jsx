@@ -1,13 +1,9 @@
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FirebaseAuth } from "../firebase/config";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { memo } from "react";
 
-
-export const Navbar = memo(({ showUsers, setShowUsers }) => {
+export const Navbar = memo(() => {
     const navigate = useNavigate();
-
     const handleSignOut = async () => {
         navigate('/');
         await FirebaseAuth.signOut();
@@ -27,7 +23,7 @@ export const Navbar = memo(({ showUsers, setShowUsers }) => {
                 <div className="container-fluid">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <a className="nav-link active" aria-current="page" href="#">Chat en tiempo real</a>
+                            <a className="nav-link active" aria-current="page">Chat en tiempo real</a>
                         </li>
                     </ul>
                     <button className="btn btn-no-style navbar-text text-danger" onClick={handleSignOut}>
@@ -35,18 +31,6 @@ export const Navbar = memo(({ showUsers, setShowUsers }) => {
                     </button>
                 </div>
             </nav>
-            <button
-                className="btn btn-primary d-md-none"
-                style={{
-                    position: "fixed",
-                    right: "10px",
-                    marginTop: "80px",
-                    zIndex: "4000"
-                }}
-                onClick={() => setShowUsers(!showUsers)}
-            >
-                <FontAwesomeIcon icon={faBars} />Usuarios
-            </button>
         </>
     )
 })
