@@ -14,7 +14,6 @@ const getMessages = postsRef => {
 }
 
 export const getMessagesByPath = async (db, path) => {
-    debugger;
     const postsRef = query(
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
