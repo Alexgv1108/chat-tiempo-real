@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom"
-import { Chat } from "../pages/chat/Chat"
 import { Login } from "../pages/login/Login"
+import { AppRouterPrivate } from "./AppRouterPrivate"
 
 export const AppRouter = () => {
   return (
     <Routes>
-        <Route path="/chat/*" element={ <Chat /> } />
+        <Route path="/chat/*" element={ <AppRouterPrivate /> } />
         <Route path="/*" element={ <Login /> } />
     </Routes>
   )

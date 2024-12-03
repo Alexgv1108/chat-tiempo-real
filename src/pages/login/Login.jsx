@@ -80,17 +80,23 @@ export const Login = () => {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <div style={{ width: '100%', maxWidth: '350px' }}>
-        <div className="card">
-          <div className="card-body">
-            <h5 className="card-title text-center">Chat en tiempo Real</h5>
-            <button type="submit" className="btn btn-primary w-100 mt-2 d-flex justify-content-center align-items-center" onClick={loginWithGoogle}>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="w-full max-w-sm">
+        <div className="bg-white shadow-lg rounded-lg mb-2">
+          <div className="p-4">
+            <h5 className="text-center text-xl font-semibold">Chat en tiempo Real</h5>
+            <button
+              type="submit"
+              className="w-full mt-2 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onClick={loginWithGoogle}
+            >
               Iniciar sesión con Google
             </button>
           </div>
         </div>
-        <p className='text-center fs-6 text-secondary text-opacity-50 mt-2'>Autor: Alexander Gallego Vasquez</p>
+        <p className="text-center text-gray-500 text-sm mt-2">
+          Autor: Alexander Gallego Vasquez
+        </p>
       </div>
     </div>
   )
