@@ -3,8 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo, useEffect, useMemo } from "react";
 import { get, ref } from "firebase/database";
 import { isDesktop } from 'react-device-detect';
+import { diffMinutes } from '@formkit/tempo'
 
 import defaultImage from '../assets/image_user.png';
+
+const ahora = new Date();
 
 export const ListUsers = memo(({ db, usuarioSesion, usuarios, setUsuarios, loading, setLoading, uidChat, setUidChat, setShowUsers }) => {
 
@@ -62,6 +65,12 @@ export const ListUsers = memo(({ db, usuarioSesion, usuarios, setUsuarios, loadi
                         <p className="text-gray-700 text-center flex-1">{userInfo.email}</p>
                         <small lass="text-gray-700 text-center flex-1">{userInfo.displayName}</small>
                     </div>
+                    {
+                        diffMinutes(ahora, userInfo.lastLogin) <= 60 
+                        ? <div className="w-3 h-3 bg-green-500 rounded-full ml-auto"></div>
+                        : <div className="w-3 h-3 bg-red-500 rounded-full ml-auto"></div>
+                    }
+                    
                 </li>
             </div>
         ));
