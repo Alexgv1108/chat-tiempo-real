@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
-import { Chat } from "../pages/chat/Chat"
-import { validateSession } from "../utils/validateSession";
+import { Chat } from "@pages/chat/Chat"
+import { validateSession } from "@utils/validateSession";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
