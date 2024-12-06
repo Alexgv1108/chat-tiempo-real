@@ -54,6 +54,8 @@ export const InputSendMessage = memo(({ db, usuarioSesionUid, uidChat, pathMessa
         uidChat && (
             <form className="bottom-0 left-0 w-full p-4 bg-white shadow-md flex items-center" onSubmit={handleNewPost} name='input-submit-message'>
                 <input
+                    name='text-message'
+                    autoComplete='off'
                     type="text"
                     className="w-full p-2 border border-gray-300 rounded-lg mr-2"
                     placeholder="Escribe un mensaje"

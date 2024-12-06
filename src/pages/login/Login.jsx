@@ -4,11 +4,11 @@ import { getDatabase, ref, set } from 'firebase/database';
 
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { validateSession } from '../../utils/validateSession';
+import { validateSession } from '@utils/validateSession';
 import { useEffect } from 'react';
 
-import treesImage from '../../assets/trees.png';
-import nyanCatGif from '../../assets/nyan-cat.gif';
+import treesImage from '@assets/trees.png';
+import nyanCatGif from '@assets/nyan-cat.gif';
 
 const googleProvider = new GoogleAuthProvider();
 const db = getDatabase();
