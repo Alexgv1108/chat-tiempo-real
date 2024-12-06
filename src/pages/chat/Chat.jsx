@@ -1,6 +1,6 @@
 import { getDatabase } from "firebase/database";
 import { useState } from "react";
-import { Navbar, Loader, ListUsers, InputSendMessage, ContainerMessages } from "../../components/";
+import { Navbar, Loader, ListUsers, InputSendMessage, ContainerMessages } from "@components";
 import { isDesktop } from 'react-device-detect';
 
 const db = getDatabase();
@@ -8,7 +8,6 @@ const db = getDatabase();
 export const Chat = ({ usuarioSesion }) => {
     if (!usuarioSesion.uid) return;
 
-    const [usuarios, setUsuarios] = useState([]);
     const [uidChat, setUidChat] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pathMessages, setPathMessages] = useState(null);
@@ -26,10 +25,7 @@ export const Chat = ({ usuarioSesion }) => {
                 }`}>
                     <ListUsers
                         db={db}
-                        usuarioSesion={usuarioSesion}
-                        usuarios={usuarios}
-                        setUsuarios={setUsuarios}
-                        loading={loading}
+                        usuarioSesionUid={usuarioSesion.uid}
                         setLoading={setLoading}
                         uidChat={uidChat}
                         setUidChat={setUidChat}
