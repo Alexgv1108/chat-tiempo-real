@@ -6,8 +6,6 @@ import { isDesktop } from 'react-device-detect';
 const db = getDatabase();
 
 export const Chat = ({ usuarioSesion }) => {
-    if (!usuarioSesion.uid) return;
-
     const [uidChat, setUidChat] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pathMessages, setPathMessages] = useState(null);
@@ -25,7 +23,7 @@ export const Chat = ({ usuarioSesion }) => {
                 }`}>
                     <ListUsers
                         db={db}
-                        usuarioSesionUid={usuarioSesion.uid}
+                        usuarioSesion={usuarioSesion}
                         setLoading={setLoading}
                         uidChat={uidChat}
                         setUidChat={setUidChat}

@@ -1,5 +1,5 @@
 export const constantes = () => {
-const CANTIDAD_MENSAJES = 10;
+const CANTIDAD_MENSAJES = 15;
 const DICCIONARIO_EMOJIS = {
   ':)': '🙂',
   'c:': '🙂',

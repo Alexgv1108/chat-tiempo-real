@@ -1,27 +1,24 @@
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { memo, useEffect, useMemo, useState } from "react";
-import { equalTo, get, orderByChild, push, query, ref } from "firebase/database";
+import { memo, useEffect, useState } from "react";
 import { isDesktop } from 'react-device-detect';
 import { diffMinutes } from '@formkit/tempo'
 import { v4 as uuid } from 'uuid'
 
-import Swal from "sweetalert2";
-import { getUserByUid, getAmigos, getUserByEmail } from "../helpers/getUser";
+import { getUserByUid, getAmigos } from "../helpers/getUser";
+import { addFriend } from "../utils/swal/addFriend";
 
 const ahora = new Date();
 const usuarios = [];
 
-export const ListUsers = memo(({ db, usuarioSesionUid, setLoading, uidChat, setUidChat, setShowUsers }) => {
+export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
     const [amigosState, setAmigosState] = useState([]);
 
     // Consulta información de los amigos en sesión
     useEffect(() => {
-        if (!usuarioSesionUid) return;
-
         (async () => {
             setLoading(true);
-            const amigos = await getAmigos(db, usuarioSesionUid);
+            const amigos = await getAmigos(db, usuarioSesion.uid);
             for (const [_, userInfo] of amigos) {
                 let amigoMap = usuarios.find(([_, usuarioItem]) => userInfo.uid === usuarioItem.uid);
 
@@ -36,7 +33,7 @@ export const ListUsers = memo(({ db, usuarioSesionUid, setLoading, uidChat, setU
             setAmigosState([...usuarios]);
             setLoading(false);
         })();
-    }, [uidChat]);
+    }, []);
 
 
     const handleChatear = uid => {
@@ -53,63 +50,8 @@ export const ListUsers = memo(({ db, usuarioSesionUid, setLoading, uidChat, setU
         setUidChat(null);
     }
 
-    const handleAddFriend = () => {
-        Swal.fire({
-            title: "Agregar un amigo.",
-            input: "text",
-            inputAttributes: {
-                autocomplete: "off",
-            },
-            html: `
-                <p>Escribe el amigo que deseas agregar<p/>
-            `,
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: "Agregar amigo",
-            showLoaderOnConfirm: true,
-            cancelButtonText: "Cerrar",
-            width: 600,
-            padding: "3em",
-            color: "#716add",
-            backdrop: `
-                rgba(0,0,123,0.4)
-                left top
-                no-repeat
-            `,
-            preConfirm: async (emailBusqueda) => {
-                try {
-                    let userFind = usuarios.find(usuarioBusqueda => usuarioBusqueda[1].email === emailBusqueda);
-                    if (!userFind) {
-                        userFind = await getUserByEmail(db, emailBusqueda);
-                        if (!userFind) return Swal.showValidationMessage(`El usuario no se encuentra registrado...`);
-                        userFind = [...userFind][0];
-                    }
-                    await saveAmigo(userFind[1]);
-                    setAmigosState(amigosState => [...amigosState, userFind]);
-                    return userFind;
-                } catch (error) {
-                    Swal.showValidationMessage(`Error al intentar agregar el mensaje, por favor intenta de nuevo más tarde...`);
-                }
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then(result => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Amigo agregado!',
-                    text: `Has agregado a ${result.value[1].displayName}`
-                });
-            }
-        })
-    }
-
-    const saveAmigo = async (newFriend) => {
-        const postData = {
-            uid: newFriend.uid,
-            fecha: new Date().getTime(),
-        };
-
-        const amigoRef = ref(db, `amigos/${usuarioSesionUid}`);
-        return push(amigoRef, postData);
+    const handleAddFriend = async () => {
+        addFriend(usuarios, usuarioSesion, db, setAmigosState);
     }
 
     return (

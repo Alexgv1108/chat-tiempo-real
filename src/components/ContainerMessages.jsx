@@ -1,10 +1,10 @@
 import { format } from "@formkit/tempo"
-import { limitToLast, onChildAdded, query, ref } from "firebase/database";
-import { memo, useEffect, useMemo, useRef, useState } from "react"
-import { getFullMessage } from "../helpers/GetMessage";
+import { onChildAdded } from "firebase/database";
+import { memo, useEffect, useRef, useState } from "react"
+import { getFullMessage, getMessagesByPathQuery } from "../helpers/GetMessage";
 
-const fechaInicioPagina = new Date();
 let isNuevoChatOMsgScroll = true;
+let heighPosicionChat = 0;
 
 export const ContainerMessages = memo(({
   db, usuarioSesionUid, pathMessages, setPathMessages, uidChat, loading, setLoading
@@ -15,36 +15,47 @@ export const ContainerMessages = memo(({
 
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState(null);
-  const [heighPosicionChat, setHeighPosicionChat] = useState(0);
 
   // Al seleccionar un nuevo chat
   useEffect(() => {
-    if (!uidChat) {
-      if (posts) setPosts([]);
-      return;
-    }
+    if (!uidChat) return;
+
     isNuevoChatOMsgScroll = true;
     const [uidChat1, uidChat2] = [uidChat, usuarioSesionUid].sort();
     setPathMessages(`${uidChat1}/${uidChat2}`);
-    setPagination(null);
     setPosts([]);
+    setPagination(null);
   }, [uidChat]);
 
-  // Listener en tiempo real para mensaje
+  // Listener en tiempo real para mensaje y consulta inicial
   useEffect(() => {
     if (!pathMessages) return;
-    const postsRef = query(ref(db, `chat/${pathMessages}`), limitToLast(1));
+    setLoading(true);
+    const postsRef = getMessagesByPathQuery(db, pathMessages);
     const unsubscribe = onChildAdded(postsRef, snapshot => {
       const newMessage = snapshot.val();
-      if (new Date(newMessage.fecha) > fechaInicioPagina) {
-        isNuevoChatOMsgScroll = true;
-        const arraySet = [[uidChat, newMessage]];
-        setPosts(postsData => [...postsData, ...arraySet]);
-      }
+      isNuevoChatOMsgScroll = true;
+      const arraySet = [[uidChat, newMessage]];
+      setPosts(postsData => [...postsData, ...arraySet]);
     });
+    setLoading(false)
 
     return () => unsubscribe();
   }, [pathMessages]);
+
+  // Consulta de mensajes al subir el scroll a 0
+  useEffect(() => {
+    if (!pagination) return;
+    (async () => {
+      const { response } = await getFullMessage(db, pathMessages, pagination);
+      if (!response) return;
+
+      // ordena por fecha
+      const responseArray = Object.entries(response);
+      const dataSort = responseArray.sort((a, b) => new Date(a[1].fecha) - new Date(b[1].fecha));
+      setPosts(postState => [...dataSort, ...postState]);
+    })();
+  }, [pagination]);
 
   // Mueve el scroll a la parte de abajo cuando se consultan los mensajes al seleccionar un nuevo chat
   useEffect(() => {
@@ -56,26 +67,7 @@ export const ContainerMessages = memo(({
     }
   }, [posts])
 
-  // Consulta de mensajes al seleccionar un chat
-  useEffect(() => {
-    if (!pathMessages) return;
-    (async () => {
-      cambiarEstadoLoading(true);
-      const { response } = await getFullMessage(db, pathMessages, pagination);
-      if (!response) {
-        cambiarEstadoLoading(false);
-        return;
-      }
-
-      const responseArray = Object.entries(response);
-
-      // ordena por fecha
-      const dataSort = responseArray.sort((a, b) => new Date(a[1].fecha) - new Date(b[1].fecha));
-      setPosts(postState => [...dataSort, ...postState]);
-      cambiarEstadoLoading(false);
-    })();
-  }, [pathMessages, pagination]);
-
+  // Cuando el scroll está en la posición 0 y se cargan nuevos mensajes
   useEffect(() => {
     if (!posts.length || !chatStartRef.current || !heighPosicionChat || loading) return;
     chatStartRef.current.scrollTo({
@@ -84,7 +76,7 @@ export const ContainerMessages = memo(({
 
   }, [posts]);
 
-  // Evento para cuando se mueve el mouse
+  // Evento para cuando se mueve el scroll
   useEffect(() => {
     if (!uidChat || !posts.length || loading) return;
     const container = chatStartRef.current;
@@ -99,47 +91,42 @@ export const ContainerMessages = memo(({
     };
   }, [posts]);
 
-  const cambiarEstadoLoading = estado => {
-    if (isNuevoChatOMsgScroll) setLoading(estado);
-  }
-
   const handleScroll = () => {
+    if (!posts.length) return;
     const position = chatStartRef.current?.scrollTop;
     if (position === 0) {
+      debugger;
       setPagination(posts[0][1].fecha);
       const { clientHeight } = chatStartRef.current;
-      setHeighPosicionChat(clientHeight);
+      heighPosicionChat = clientHeight;
     }
   };
 
-
-  const getMessages = useMemo(() => {
-    return posts.map(([uid, postContent], i) => (
-      <div
-        key={`${uid}-${postContent.uid}`}
-        className={`shadow-sm mb-3 rounded-lg p-4 ${postContent.uid === usuarioSesionUid
-          ? 'bg-gray-600 text-white ml-auto'
-          : 'bg-gray-100 text-gray-800 mr-auto'
-          }`}
-        style={{
-          maxWidth: "80%",
-        }}
-      >
-        <div className="flex justify-between items-center">
-          <p className="text-sm flex-grow">{postContent.mensaje}</p>
-          <small className="text-gray-500">{format(new Date(postContent.fecha), { date: "short", time: "medium" })}</small>
-        </div>
-      </div>
-    ));
-  }, [posts]);
-
   return (
-    <div className="flex-grow overflow-auto">
-      <div
-        ref={chatStartRef}
-        className="mt-24 ml-4 mr-4"
-      >
-        {getMessages}
+    <div className="flex-grow overflow-auto" ref={chatStartRef}>
+      <div className="mt-24 ml-4 mr-4">
+        {
+          posts.map(([_, postContent]) => (
+            <div
+              key={postContent.uidUnico}
+              className={`shadow-sm mb-3 rounded-lg p-4 ${postContent.uid === usuarioSesionUid
+                ? 'bg-gray-600 text-white ml-auto'
+                : 'bg-gray-100 text-gray-800 mr-auto'
+                }`}
+              style={{
+                maxWidth: "80%",
+              }}
+            >
+              <div className="flex justify-between items-center">
+                <p className="text-sm flex-grow">{postContent.mensaje}</p>
+                <small className={`${postContent.uid === usuarioSesionUid
+                  ? 'text-white'
+                  : 'text-gray-500'
+                  }`}>{format(new Date(postContent.fecha), { date: "short", time: "medium" })}</small>
+              </div>
+            </div>
+          ))
+        }
       </div>
       <div ref={chatEndRef} />
     </div>
