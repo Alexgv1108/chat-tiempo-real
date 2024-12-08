@@ -13,34 +13,31 @@ const getMessages = postsRef => {
     }
 }
 
-export const getMessagesByPath = async (db, path) => {
-    const postsRef = query(
+export const getMessagesByPathQuery = (db, path) => {
+    return query(
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
         limitToLast(CANTIDAD_MENSAJES)
     );
-    
-    return getMessages(postsRef);
 }
 
-export const getMessagesByPathAndPagination = async (db, path, datePagination) => {
-    const postsRef = query(
+export const getMessagesByPathAndPaginationQuery = (db, path, datePagination) => {
+    return query(
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
         endBefore(datePagination),
         limitToLast(CANTIDAD_MENSAJES),
         
     );
-    
-    return getMessages(postsRef);
 }
 
 export const getFullMessage = async(db, pathConst, datePagination) => {
-    const getMessageFrom = datePagination
-        ? await getMessagesByPathAndPagination(db, pathConst || path, datePagination)
-        : await getMessagesByPath(db, pathConst || path);
+    const getMessageQuery = datePagination
+        ? getMessagesByPathAndPaginationQuery(db, pathConst || path, datePagination)
+        : getMessagesByPathQuery(db, pathConst || path);
 
+    const getMessage = await getMessages(getMessageQuery);
     return { 
-        response: getMessageFrom.val()
+        response: getMessage.val()
     };
 }
