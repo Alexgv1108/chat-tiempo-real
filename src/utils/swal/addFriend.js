@@ -1,6 +1,6 @@
 import { push, ref } from "firebase/database";
 import Swal from "sweetalert2";
-import { getUserByEmail } from "../../helpers/getUser";
+import { getUserByEmail } from "@helpers";
 
 export const addFriend = (usuarios, usuarioSesion, db, setAmigosState) => {
     Swal.fire({
@@ -27,7 +27,6 @@ export const addFriend = (usuarios, usuarioSesion, db, setAmigosState) => {
         `,
         preConfirm: async (emailBusqueda) => {
             try {
-                debugger;
                 if (usuarioSesion.email === emailBusqueda) {
                     Swal.showValidationMessage(`El correo ingresado es el del usuario en sesión...`);
                     return;
