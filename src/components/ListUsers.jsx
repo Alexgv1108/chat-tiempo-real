@@ -1,3 +1,4 @@
+import { getUserByUid, getAmigos } from "@helpers";
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo, useEffect, useState } from "react";
@@ -5,11 +6,14 @@ import { isDesktop } from 'react-device-detect';
 import { diffMinutes } from '@formkit/tempo'
 import { v4 as uuid } from 'uuid'
 
-import { getUserByUid, getAmigos } from "../helpers/getUser";
 import { addFriend } from "../utils/swal/addFriend";
+import { saveOrUpdateUser } from "@helpers";
+import { suscribeUsers } from "../helpers/suscribeUsers";
+import { off } from "firebase/database";
 
 const ahora = new Date();
 const usuarios = [];
+let puedeEjecutar = false;
 
 export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
     const [amigosState, setAmigosState] = useState([]);
@@ -34,6 +38,54 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
             setLoading(false);
         })();
     }, []);
+
+    // Actualiza en tiempo real el estado del usuario
+    useEffect(() => {
+        const newListeners = [];
+        let arrAmigos = {};
+        amigosState.forEach(([_, item]) => {
+            arrAmigos[item.uid] = {};
+            const { rutaRef, listener } = suscribeUsers(db, item.uid, snapshotUsuario => {
+                const newMessageUserKey = snapshotUsuario.key;
+                debugger;
+                if (newMessageUserKey !== 'isSesion' && newMessageUserKey !== 'lastLogin') return;
+
+                const newMessageUserVal = snapshotUsuario.val();
+                arrAmigos[item.uid][newMessageUserKey] = newMessageUserVal;
+                let amigoFind = amigosState.find(([_, amigoS]) => amigoS.uid === item.uid);
+                amigoFind[1][newMessageUserKey] = newMessageUserVal;
+                setAmigosState(amigoS => amigoS.map((amigoM) =>
+                    amigoM.uid === item.uid ? amigoFind : amigoM
+                ));
+
+            });
+            newListeners.push({ rutaRef, listener });
+        });
+
+        return () => {
+            newListeners.forEach(({ rutaRef, listener }) => {
+                off(rutaRef, "child_added", listener);
+            });
+        };
+    }, [amigosState])
+
+    useEffect(() => {
+        document.addEventListener('mousemove', validacionMinutos);
+        return () => {
+            document.removeEventListener('mousemove', validacionMinutos);
+        }
+    }, []);
+
+    // evento para validación de sesión, cada minuto segundo se habilita para evitar asignar en mucha cantidad el new Date
+    const validacionMinutos = async () => {
+        if (!puedeEjecutar) return;
+        puedeEjecutar = false;
+        await saveOrUpdateUser(db, usuarioSesion, true);
+        setTimeout(() => {
+            puedeEjecutar = true;
+        }, 60000);
+    }
+
 
 
     const handleChatear = uid => {
@@ -92,7 +144,7 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
                                             <small lass="text-gray-700 text-center flex-1">{amigoMap.displayName}</small>
                                         </div>
                                         {
-                                            diffMinutes(ahora, amigoMap.lastLogin) <= 60
+                                            amigoMap.isSesion && diffMinutes(ahora, amigoMap.lastLogin) <= 60
                                                 ? <div className="w-3 h-3 bg-green-500 rounded-full ml-auto"></div>
                                                 : <div className="w-3 h-3 bg-red-500 rounded-full ml-auto"></div>
                                         }

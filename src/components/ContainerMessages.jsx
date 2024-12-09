@@ -1,7 +1,6 @@
 import { format } from "@formkit/tempo"
-import { onChildAdded } from "firebase/database";
 import { memo, useEffect, useRef, useState } from "react"
-import { getFullMessage, getMessagesByPathQuery } from "../helpers/GetMessage";
+import { getFullMessage, getMessagesByPathQuery, suscribeMessage } from "@helpers";
 
 let isNuevoChatOMsgScroll = true;
 let heighPosicionChat = 0;
@@ -32,7 +31,7 @@ export const ContainerMessages = memo(({
     if (!pathMessages) return;
     setLoading(true);
     const postsRef = getMessagesByPathQuery(db, pathMessages);
-    const unsubscribe = onChildAdded(postsRef, snapshot => {
+    const unsubscribe = suscribeMessage(postsRef, snapshot => {
       const newMessage = snapshot.val();
       isNuevoChatOMsgScroll = true;
       const arraySet = [[uidChat, newMessage]];
@@ -95,7 +94,6 @@ export const ContainerMessages = memo(({
     if (!posts.length) return;
     const position = chatStartRef.current?.scrollTop;
     if (position === 0) {
-      debugger;
       setPagination(posts[0][1].fecha);
       const { clientHeight } = chatStartRef.current;
       heighPosicionChat = clientHeight;
