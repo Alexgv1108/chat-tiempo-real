@@ -15,7 +15,10 @@ export const Chat = ({ usuarioSesion }) => {
         <>
             {loading && (<Loader />)}
 
-            <Navbar />
+            <Navbar 
+                db={db} 
+                usuarioSesion={usuarioSesion}
+            />
             <div className="grid grid-cols-4">
                 <div className={`${ 
                     isDesktop ? 'col-span-1' 

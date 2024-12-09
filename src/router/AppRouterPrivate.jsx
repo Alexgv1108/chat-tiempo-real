@@ -3,7 +3,6 @@ import { Loader } from "@components";
 import { Chat } from "@pages/chat/Chat"
 import { validateSession } from "@utils/validateSession";
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 
 export const AppRouterPrivate = () => {
 
@@ -20,7 +19,6 @@ export const AppRouterPrivate = () => {
                 if (usuarioSesion) return;
                 setUsuarioSesion(user);
             } else {
-                Swal.fire('Ups', 'No has iniciado sesión', 'warning');
                 navigate('/');
             }
         });
