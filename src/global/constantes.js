@@ -1,5 +1,10 @@
 export const constantes = () => {
-const CANTIDAD_MENSAJES = 15;
+const CANTIDAD_MENSAJES = 20;
+const STATES_SESSION = {
+  LOGOUT: 'LOGOUT',
+  PENDING: 'PENDING',
+  LOGIN: 'LOGIN'
+}
 const DICCIONARIO_EMOJIS = {
   ':)': '🙂',
   'c:': '🙂',
@@ -20,6 +25,7 @@ const DICCIONARIO_EMOJIS = {
 }
   return {
     CANTIDAD_MENSAJES,
-    DICCIONARIO_EMOJIS
+    DICCIONARIO_EMOJIS,
+    STATES_SESSION
   }
 }

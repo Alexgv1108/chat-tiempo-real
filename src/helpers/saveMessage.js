@@ -1,8 +1,10 @@
-import { push, ref } from 'firebase/database';
+import { getDatabase, push, ref } from 'firebase/database';
 import Swal from 'sweetalert2';
 import { v4 as uuid } from 'uuid'
 
-export const saveMessage = async (db, usuarioSesionUid, uidChat, pathMessages, inputRef) => {
+const db = getDatabase();
+
+export const saveMessage = async (usuarioSesionUid, uidChat, pathMessages, inputRef) => {
     try {
         const fecha = new Date().getTime();
         const newUuid = uuid();

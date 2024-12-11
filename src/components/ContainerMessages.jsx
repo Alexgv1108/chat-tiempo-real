@@ -4,9 +4,11 @@ import { getFullMessage, getMessagesByPathQuery, suscribeMessage } from "@helper
 
 let isNuevoChatOMsgScroll = true;
 let heighPosicionChat = 0;
+let isAnimacionMensaje = false;
+const fechaActual = new Date();
 
 export const ContainerMessages = memo(({
-  db, usuarioSesionUid, pathMessages, setPathMessages, uidChat, loading, setLoading
+  usuarioSesionUid, pathMessages, setPathMessages, uidChat, loading, setLoading
 }) => {
 
   const chatStartRef = useRef();
@@ -20,6 +22,7 @@ export const ContainerMessages = memo(({
     if (!uidChat) return;
 
     isNuevoChatOMsgScroll = true;
+    isAnimacionMensaje = false;
     const [uidChat1, uidChat2] = [uidChat, usuarioSesionUid].sort();
     setPathMessages(`${uidChat1}/${uidChat2}`);
     setPosts([]);
@@ -30,9 +33,13 @@ export const ContainerMessages = memo(({
   useEffect(() => {
     if (!pathMessages) return;
     setLoading(true);
-    const postsRef = getMessagesByPathQuery(db, pathMessages);
+    const postsRef = getMessagesByPathQuery(pathMessages);
     const unsubscribe = suscribeMessage(postsRef, snapshot => {
       const newMessage = snapshot.val();
+      const messageDate = new Date(newMessage.fecha);
+      if (messageDate > fechaActual ) {
+        isAnimacionMensaje = true;
+      }
       isNuevoChatOMsgScroll = true;
       const arraySet = [[uidChat, newMessage]];
       setPosts(postsData => [...postsData, ...arraySet]);
@@ -46,7 +53,7 @@ export const ContainerMessages = memo(({
   useEffect(() => {
     if (!pagination) return;
     (async () => {
-      const { response } = await getFullMessage(db, pathMessages, pagination);
+      const { response } = await getFullMessage(pathMessages, pagination);
       if (!response) return;
 
       // ordena por fecha
@@ -69,8 +76,10 @@ export const ContainerMessages = memo(({
   // Cuando el scroll está en la posición 0 y se cargan nuevos mensajes
   useEffect(() => {
     if (!posts.length || !chatStartRef.current || !heighPosicionChat || loading) return;
+    const { scrollHeight } = chatStartRef.current;
+    const nuevPosScroll = scrollHeight - heighPosicionChat
     chatStartRef.current.scrollTo({
-      top: heighPosicionChat
+      top: nuevPosScroll
     });
 
   }, [posts]);
@@ -92,11 +101,12 @@ export const ContainerMessages = memo(({
 
   const handleScroll = () => {
     if (!posts.length) return;
-    const position = chatStartRef.current?.scrollTop;
-    if (position === 0) {
+    const position = chatStartRef.current;
+    // Se ajusta en 150 para que no sea necesario subir el scroll por completo
+    if (position?.scrollTop < 150) {
       setPagination(posts[0][1].fecha);
-      const { clientHeight } = chatStartRef.current;
-      heighPosicionChat = clientHeight;
+      const { scrollHeight } = position;
+      heighPosicionChat = scrollHeight;
     }
   };
 
@@ -104,13 +114,16 @@ export const ContainerMessages = memo(({
     <div className="flex-grow overflow-auto" ref={chatStartRef}>
       <div className="mt-24 ml-4 mr-4">
         {
-          posts.map(([_, postContent]) => (
+          posts.map(([_, postContent], index) => (
             <div
               key={postContent.uidUnico}
-              className={`shadow-sm mb-3 rounded-lg p-4 ${postContent.uid === usuarioSesionUid
-                ? 'bg-gray-600 text-white ml-auto'
-                : 'bg-gray-100 text-gray-800 mr-auto'
-                }`}
+              className={`shadow-sm mb-3 rounded-lg p-4
+                ${postContent.uid === usuarioSesionUid
+                  ? 'bg-gray-600 text-white ml-auto'
+                  : 'bg-gray-100 text-gray-800 mr-auto'
+                }
+                ${ index === (posts.length - 1) && isAnimacionMensaje ? 'animate-growFromBottom' : ''}
+              `}
               style={{
                 maxWidth: "80%",
               }}

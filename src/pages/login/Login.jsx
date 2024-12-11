@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import { activeSession } from '../../utils/swal/activeSession';
 import { popUpLoginWithGoogle } from '@helpers';
 
-const db = getDatabase();
 let isLoginPending = false;
 
 export const Login = () => {
@@ -28,7 +27,7 @@ export const Login = () => {
   const loginWithGoogle = async (event) => {
     event.preventDefault();
     isLoginPending = true;
-    const { isLogin } = await popUpLoginWithGoogle(db);
+    const { isLogin } = await popUpLoginWithGoogle();
     if (isLogin) navigate('/chat');
     else {
       Swal.fire('ups', 'No has iniciado sesión de forma correcta.');

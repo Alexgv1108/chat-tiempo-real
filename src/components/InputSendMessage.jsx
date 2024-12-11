@@ -6,7 +6,7 @@ import { saveMessage } from '@helpers';
 const { DICCIONARIO_EMOJIS } = constantes();
 
 let contadorEnviosVacios = 0;
-export const InputSendMessage = memo(({ db, usuarioSesionUid, uidChat, pathMessages }) => {
+export const InputSendMessage = memo(({ usuarioSesionUid, uidChat, pathMessages }) => {
 
     const inputRef = useRef();
 
@@ -23,7 +23,7 @@ export const InputSendMessage = memo(({ db, usuarioSesionUid, uidChat, pathMessa
             return
         };
         contadorEnviosVacios = 0;
-        saveMessage(db, usuarioSesionUid, uidChat, pathMessages, inputRef);
+        saveMessage(usuarioSesionUid, uidChat, pathMessages, inputRef);
     }
 
     const reemplazoEmojiDinamico = () => {
