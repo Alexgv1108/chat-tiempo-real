@@ -1,6 +1,8 @@
-import { ref, set } from "firebase/database";
+import { getDatabase, ref, set } from "firebase/database";
 
-export const saveOrUpdateUser = async (db, user, isSesion) => {
+const db = getDatabase();
+
+export const saveOrUpdateUser = async (user, stateSession) => {
     const userRef = ref(db, 'usuarios/' + user.uid);
     return set(userRef, {
         uid: user.uid,
@@ -8,6 +10,6 @@ export const saveOrUpdateUser = async (db, user, isSesion) => {
         displayName: user.displayName,
         photoURL: user.photoURL,
         lastLogin: new Date().toISOString(),
-        isSesion: isSesion
+        stateSession: stateSession
     });
 }

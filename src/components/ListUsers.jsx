@@ -7,28 +7,28 @@ import { diffMinutes } from '@formkit/tempo'
 import { v4 as uuid } from 'uuid'
 
 import { addFriend } from "../utils/swal/addFriend";
-import { saveOrUpdateUser } from "@helpers";
 import { suscribeUsers } from "../helpers/suscribeUsers";
 import { off } from "firebase/database";
+import { constantes } from "../global/constantes";
 
 const ahora = new Date();
 const usuarios = [];
-let puedeEjecutar = false;
+const { STATES_SESSION } = constantes();
 
-export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
+export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
     const [amigosState, setAmigosState] = useState([]);
 
     // Consulta información de los amigos en sesión
     useEffect(() => {
         (async () => {
             setLoading(true);
-            const amigos = await getAmigos(db, usuarioSesion.uid);
+            const amigos = await getAmigos(usuarioSesion.uid);
             for (const [_, userInfo] of amigos) {
                 let amigoMap = usuarios.find(([_, usuarioItem]) => userInfo.uid === usuarioItem.uid);
 
                 if (!amigoMap) {
                     // Si no existe en el estado, buscar en Firebase
-                    const nuevoAmigoMap = await getUserByUid(db, userInfo.uid);
+                    const nuevoAmigoMap = await getUserByUid(userInfo.uid);
 
                     const newUuid = uuid();
                     usuarios.push([newUuid, nuevoAmigoMap]);
@@ -42,16 +42,12 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
     // Actualiza en tiempo real el estado del usuario
     useEffect(() => {
         const newListeners = [];
-        let arrAmigos = {};
         amigosState.forEach(([_, item]) => {
-            arrAmigos[item.uid] = {};
-            const { rutaRef, listener } = suscribeUsers(db, item.uid, snapshotUsuario => {
+            const { rutaRef, listener } = suscribeUsers(item.uid, snapshotUsuario => {
                 const newMessageUserKey = snapshotUsuario.key;
-                debugger;
-                if (newMessageUserKey !== 'isSesion' && newMessageUserKey !== 'lastLogin') return;
+                if (newMessageUserKey !== 'stateSession' && newMessageUserKey !== 'lastLogin') return;
 
                 const newMessageUserVal = snapshotUsuario.val();
-                arrAmigos[item.uid][newMessageUserKey] = newMessageUserVal;
                 let amigoFind = amigosState.find(([_, amigoS]) => amigoS.uid === item.uid);
                 amigoFind[1][newMessageUserKey] = newMessageUserVal;
                 setAmigosState(amigoS => amigoS.map((amigoM) =>
@@ -69,24 +65,6 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
         };
     }, [amigosState])
 
-    useEffect(() => {
-        document.addEventListener('mousemove', validacionMinutos);
-        return () => {
-            document.removeEventListener('mousemove', validacionMinutos);
-        }
-    }, []);
-
-    // evento para validación de sesión, cada minuto segundo se habilita para evitar asignar en mucha cantidad el new Date
-    const validacionMinutos = async () => {
-        if (!puedeEjecutar) return;
-        puedeEjecutar = false;
-        await saveOrUpdateUser(db, usuarioSesion, true);
-        setTimeout(() => {
-            puedeEjecutar = true;
-        }, 60000);
-    }
-
-
 
     const handleChatear = uid => {
         if (uid === uidChat) return;
@@ -103,7 +81,7 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
     }
 
     const handleAddFriend = async () => {
-        addFriend(usuarios, usuarioSesion, db, setAmigosState);
+        addFriend(usuarios, usuarioSesion, setAmigosState);
     }
 
     return (
@@ -144,9 +122,11 @@ export const ListUsers = memo(({ db, usuarioSesion, setLoading, uidChat, setUidC
                                             <small lass="text-gray-700 text-center flex-1">{amigoMap.displayName}</small>
                                         </div>
                                         {
-                                            amigoMap.isSesion && diffMinutes(ahora, amigoMap.lastLogin) <= 60
+                                            amigoMap.stateSession === STATES_SESSION.LOGIN && diffMinutes(ahora, amigoMap.lastLogin) < 5
                                                 ? <div className="w-3 h-3 bg-green-500 rounded-full ml-auto"></div>
-                                                : <div className="w-3 h-3 bg-red-500 rounded-full ml-auto"></div>
+                                                : amigoMap.stateSession === STATES_SESSION.PENDING 
+                                                    ? <div className="w-3 h-3 bg-yellow-500 rounded-full ml-auto"></div>
+                                                    : <div className="w-3 h-3 bg-red-500 rounded-full ml-auto"></div>
                                         }
 
                                     </li>
