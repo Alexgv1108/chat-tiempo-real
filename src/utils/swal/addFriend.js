@@ -1,8 +1,11 @@
-import { push, ref } from "firebase/database";
+import { getDatabase, push, ref } from "firebase/database";
 import Swal from "sweetalert2";
 import { getUserByEmail } from "@helpers";
 
-export const addFriend = (usuarios, usuarioSesion, db, setAmigosState) => {
+// TODO: mover a helper
+const db = getDatabase();
+
+export const addFriend = (usuarios, usuarioSesion, setAmigosState) => {
     Swal.fire({
         title: "Agregar un amigo.",
         input: "text",
@@ -33,11 +36,11 @@ export const addFriend = (usuarios, usuarioSesion, db, setAmigosState) => {
                 }
                 let userFind = usuarios.find(usuarioBusqueda => usuarioBusqueda[1].email === emailBusqueda);
                 if (!userFind) {
-                    userFind = await getUserByEmail(db, emailBusqueda);
+                    userFind = await getUserByEmail(emailBusqueda);
                     if (!userFind) return Swal.showValidationMessage(`El usuario no se encuentra registrado...`);
                     userFind = [...userFind][0];
                 }
-                await saveAmigo(db, userFind[1], usuarioSesion);
+                await saveAmigo(userFind[1], usuarioSesion);
                 setAmigosState(amigosState => [...amigosState, userFind]);
                 return userFind;
             } catch (error) {
@@ -55,7 +58,7 @@ export const addFriend = (usuarios, usuarioSesion, db, setAmigosState) => {
     })
 }
 
-const saveAmigo = async (db, newFriend, usuarioSesion) => {
+const saveAmigo = async (newFriend, usuarioSesion) => {
     const postData = {
         uid: newFriend.uid,
         fecha: new Date().getTime(),

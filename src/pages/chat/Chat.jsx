@@ -1,9 +1,7 @@
-import { getDatabase } from "firebase/database";
 import { useState } from "react";
 import { Navbar, Loader, ListUsers, InputSendMessage, ContainerMessages } from "@components";
 import { isDesktop } from 'react-device-detect';
-
-const db = getDatabase();
+import { stateSesionUser } from "@utils/stateSesionUser";
 
 export const Chat = ({ usuarioSesion }) => {
     const [uidChat, setUidChat] = useState(null);
@@ -11,12 +9,14 @@ export const Chat = ({ usuarioSesion }) => {
     const [pathMessages, setPathMessages] = useState(null);
     const [showUsers, setShowUsers] = useState(false);
 
+    // Listener para cuando se mueve el mouse, gestiona el estado en sesión
+    stateSesionUser(usuarioSesion);
+
     return (
         <>
             {loading && (<Loader />)}
 
-            <Navbar 
-                db={db} 
+            <Navbar
                 usuarioSesion={usuarioSesion}
             />
             <div className="grid grid-cols-4">
@@ -25,7 +25,6 @@ export const Chat = ({ usuarioSesion }) => {
                     : (showUsers ? 'left-0 col-span-4' : 'absolute -left-[300px]')
                 }`}>
                     <ListUsers
-                        db={db}
                         usuarioSesion={usuarioSesion}
                         setLoading={setLoading}
                         uidChat={uidChat}
@@ -38,7 +37,6 @@ export const Chat = ({ usuarioSesion }) => {
                     <div className="flex flex-col h-full">
                         {
                             <ContainerMessages
-                                db={db}
                                 usuarioSesionUid={usuarioSesion.uid}
                                 pathMessages={pathMessages}
                                 uidChat={uidChat}
@@ -48,7 +46,6 @@ export const Chat = ({ usuarioSesion }) => {
                             />
                         }
                         <InputSendMessage
-                            db={db}
                             usuarioSesionUid={usuarioSesion.uid}
                             uidChat={uidChat}
                             pathMessages={pathMessages}

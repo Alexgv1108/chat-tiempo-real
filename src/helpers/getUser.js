@@ -1,6 +1,8 @@
-import { equalTo, get, orderByChild, query, ref } from "firebase/database";
+import { equalTo, get, getDatabase, orderByChild, query, ref } from "firebase/database";
 
-export const getUserByUid = async (db, uid) => {
+const db = getDatabase();
+
+export const getUserByUid = async (uid) => {
     try {
         const usuarioRef = ref(db, `usuarios/${uid}`);
         const response = await get(usuarioRef);
@@ -10,7 +12,7 @@ export const getUserByUid = async (db, uid) => {
     }
 }
 
-export const getAmigos = async (db, uid) => {
+export const getAmigos = async (uid) => {
     try {
         const amigosRef = ref(db, `amigos/${uid}`);
         const response = await get(amigosRef);
@@ -21,7 +23,7 @@ export const getAmigos = async (db, uid) => {
     }
 }
 
-export const getUserByEmail = async (db, email) => {
+export const getUserByEmail = async (email) => {
     const usuariosRef = ref(db, 'usuarios');
     const consulta = query(usuariosRef, orderByChild('email'), equalTo(email));
 

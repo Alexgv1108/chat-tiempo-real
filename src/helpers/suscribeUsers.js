@@ -1,6 +1,8 @@
-import { onChildChanged, ref } from "firebase/database";
+import { getDatabase, onChildChanged, ref } from "firebase/database";
 
-export const suscribeUsers = (db, uid, callback) => {
+const db = getDatabase();
+
+export const suscribeUsers = (uid, callback) => {
     try {
         const usuariosRef = ref(db, `usuarios/${uid}`);
         return {
