@@ -3,17 +3,15 @@ import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo, useEffect, useState } from "react";
 import { isDesktop } from 'react-device-detect';
-import { diffMinutes } from '@formkit/tempo'
 import { v4 as uuid } from 'uuid'
 
 import { addFriend } from "../utils/swal/addFriend";
 import { suscribeUsers } from "../helpers/suscribeUsers";
 import { off } from "firebase/database";
-import { constantes } from "../global/constantes";
+import { User } from "./User";
 
 const ahora = new Date();
 const usuarios = [];
-const { STATES_SESSION } = constantes();
 
 export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
     const [amigosState, setAmigosState] = useState([]);
@@ -65,13 +63,6 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
         };
     }, [amigosState])
 
-
-    const handleChatear = uid => {
-        if (uid === uidChat) return;
-        setUidChat(uid);
-        setShowUsers(false);
-    }
-
     const handleShowUser = () => {
         setShowUsers(showUsers => !showUsers);
     }
@@ -111,26 +102,14 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
                     <ul className="flex-grow overflow-auto">
                         {
                             amigosState.map(([uidUnico, amigoMap]) => (
-                                <div
-                                    className="item-hover mb-2"
-                                    onClick={() => { handleChatear(amigoMap.uid) }}
+                                <User
                                     key={uidUnico}
-                                >
-                                    <li className={`flex items-center py-2 cursor-pointer p-2 ${amigoMap.uid === uidChat ? 'bg-blue-100' : ''}`}>
-                                        <div>
-                                            <p className="text-gray-700 text-center flex-1">{amigoMap.email}</p>
-                                            <small lass="text-gray-700 text-center flex-1">{amigoMap.displayName}</small>
-                                        </div>
-                                        {
-                                            amigoMap.stateSession === STATES_SESSION.LOGIN && diffMinutes(ahora, amigoMap.lastLogin) < 5
-                                                ? <div className="w-3 h-3 bg-green-500 rounded-full ml-auto"></div>
-                                                : amigoMap.stateSession === STATES_SESSION.PENDING 
-                                                    ? <div className="w-3 h-3 bg-yellow-500 rounded-full ml-auto"></div>
-                                                    : <div className="w-3 h-3 bg-red-500 rounded-full ml-auto"></div>
-                                        }
-
-                                    </li>
-                                </div>
+                                    amigoMap={amigoMap}
+                                    uidChat={uidChat}
+                                    ahora={ahora}
+                                    setUidChat={setUidChat}
+                                    setShowUsers={setShowUsers}
+                                />
                             ))
                         }
                     </ul>

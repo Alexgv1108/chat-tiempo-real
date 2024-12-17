@@ -1,12 +1,10 @@
-import { endBefore, get, getDatabase, limitToLast, orderByChild, query, ref } from "firebase/database";
+import { endBefore, get, getDatabase, limitToLast, orderByChild, query, ref, startAt } from "firebase/database";
 import Swal from "sweetalert2";
-import { constantes } from "../global/constantes";
+import { CANTIDAD_MENSAJES } from '@global/constantes';
 
 const db = getDatabase();
-const { CANTIDAD_MENSAJES } = constantes();
 
-
-const getMessages = postsRef => {
+export const getMessages = postsRef => {
     try {
         return get(postsRef);
     } catch (error) {
@@ -20,6 +18,14 @@ export const getMessagesByPathQuery = (path) => {
         ref(db, `chat/${path}`),
         orderByChild("fecha"),
         limitToLast(CANTIDAD_MENSAJES)
+    );
+}
+
+export const getMessagesAtTimeNow = (path) => {
+    return query(
+        ref(db, `chat/${path}`),
+        orderByChild("fecha"),
+        startAt(Date.now())
     );
 }
 
