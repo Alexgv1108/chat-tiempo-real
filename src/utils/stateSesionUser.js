@@ -1,9 +1,6 @@
 import { useEffect } from "react";
 import { saveOrUpdateUser } from "@helpers";
-import { constantes } from "../global/constantes";
-
-const TIME_TIME_OUT = 240000;
-const { STATES_SESSION } = constantes();
+import { STATES_SESSION, TIME_TIME_OUT } from '@global/constantes';
 
 let puedeEjecutar = true;
 let timeOut = null;
@@ -24,14 +21,13 @@ export const stateSesionUser = (usuarioSesion) => {
         }
     }, []);
 
+    // Evento para que el usuario aparezca en estado inactivo pero no desconectado
     useEffect(() => {
         intervalo = intervalSessionPending(usuarioSesion);
         return () => {
             if (intervalo) clearInterval(intervalo);
         }
     }, [])
-
-
 }
 
 // evento para validación de sesión, cada x minutos se habilita para evitar asignar en mucha cantidad el new Date
@@ -54,5 +50,5 @@ const intervalSessionPending = (usuarioSesion) => {
         if (ultimoState !== STATES_SESSION.LOGIN) return;
         await saveOrUpdateUser(usuarioSesion, STATES_SESSION.PENDING);
         ultimoState = STATES_SESSION.PENDING;
-    }, TIME_TIME_OUT * 3);
+    }, TIME_TIME_OUT * 2);
 }

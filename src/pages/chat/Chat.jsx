@@ -5,8 +5,7 @@ import { stateSesionUser } from "@utils/stateSesionUser";
 
 export const Chat = ({ usuarioSesion }) => {
     const [uidChat, setUidChat] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [pathMessages, setPathMessages] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [showUsers, setShowUsers] = useState(false);
 
     // Listener para cuando se mueve el mouse, gestiona el estado en sesión
@@ -14,7 +13,7 @@ export const Chat = ({ usuarioSesion }) => {
 
     return (
         <>
-            {loading && (<Loader />)}
+            { loading && (<Loader />) }
 
             <Navbar
                 usuarioSesion={usuarioSesion}
@@ -38,17 +37,13 @@ export const Chat = ({ usuarioSesion }) => {
                         {
                             <ContainerMessages
                                 usuarioSesionUid={usuarioSesion.uid}
-                                pathMessages={pathMessages}
                                 uidChat={uidChat}
                                 loading={loading}
-                                setLoading={setLoading}
-                                setPathMessages={setPathMessages}
                             />
                         }
                         <InputSendMessage
                             usuarioSesionUid={usuarioSesion.uid}
                             uidChat={uidChat}
-                            pathMessages={pathMessages}
                         />
                     </div>
                 </div>

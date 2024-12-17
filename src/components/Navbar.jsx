@@ -2,14 +2,13 @@ import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FirebaseAuth } from "../firebase/config";
 import { saveOrUpdateUser } from "@helpers";
-import { constantes } from "../global/constantes";
-
-const { STATES_SESSION } = constantes();
+import { STATES_SESSION } from '@global/constantes';
 
 export const Navbar = memo(({usuarioSesion}) => {
     const navigate = useNavigate();
     const handleSignOut = async () => {
         await saveOrUpdateUser(usuarioSesion, STATES_SESSION.LOGOUT);
+        sessionStorage.clear();
         navigate('/');
         await FirebaseAuth.signOut();
     }

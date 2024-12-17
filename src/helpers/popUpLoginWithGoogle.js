@@ -1,10 +1,9 @@
 import { saveOrUpdateUser } from "@helpers";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { FirebaseAuth } from "../firebase/config";
-import { constantes } from "../global/constantes";
+import { STATES_SESSION } from '@global/constantes';
 
 const googleProvider = new GoogleAuthProvider();
-const { STATES_SESSION } = constantes();
 
 export const popUpLoginWithGoogle = async () => {
     try {
