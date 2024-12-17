@@ -11,6 +11,8 @@ export default defineConfig({
       '@components': '/src/components',
       '@utils': '/src/utils',
       '@helpers': '/src/helpers',
+      '@global': '/src/global',
+      '@store': '/src/store',
     },
   }
 })

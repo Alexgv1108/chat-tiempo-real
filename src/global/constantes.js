@@ -1,11 +1,11 @@
-export const constantes = () => {
-const CANTIDAD_MENSAJES = 20;
-const STATES_SESSION = {
+export const CANTIDAD_MENSAJES = 20;
+export const TIME_TIME_OUT = 300000;
+export const STATES_SESSION = {
   LOGOUT: 'LOGOUT',
   PENDING: 'PENDING',
   LOGIN: 'LOGIN'
 }
-const DICCIONARIO_EMOJIS = {
+export const DICCIONARIO_EMOJIS = {
   ':)': '🙂',
   'c:': '🙂',
   'C:': '🙂',
@@ -22,10 +22,4 @@ const DICCIONARIO_EMOJIS = {
   ":'(": '😢',
   ":''(": '😢',
   ':"(': '😢',
-}
-  return {
-    CANTIDAD_MENSAJES,
-    DICCIONARIO_EMOJIS,
-    STATES_SESSION
-  }
 }

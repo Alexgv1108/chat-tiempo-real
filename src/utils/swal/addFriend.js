@@ -30,17 +30,24 @@ export const addFriend = (usuarios, usuarioSesion, setAmigosState) => {
         `,
         preConfirm: async (emailBusqueda) => {
             try {
-                if (usuarioSesion.email === emailBusqueda) {
-                    Swal.showValidationMessage(`El correo ingresado es el del usuario en sesión...`);
-                    return;
+                if (!emailBusqueda) {
+                    return Swal.showValidationMessage(`Debes de ingresar un correo electrónico.`);
                 }
-                let userFind = usuarios.find(usuarioBusqueda => usuarioBusqueda[1].email === emailBusqueda);
-                if (!userFind) {
-                    userFind = await getUserByEmail(emailBusqueda);
-                    if (!userFind) return Swal.showValidationMessage(`El usuario no se encuentra registrado...`);
-                    userFind = [...userFind][0];
+                const emailBusquedaLower = emailBusqueda.toLowerCase();
+                if (usuarioSesion.email === emailBusquedaLower) {
+                    return Swal.showValidationMessage(`El correo ingresado es el del usuario en sesión.`);
                 }
+                let userFind = usuarios.find(usuarioBusqueda => usuarioBusqueda[1].email === emailBusquedaLower);
+                if (userFind) {
+                    return Swal.showValidationMessage(`El usuario ya se encuentra agregado.`);
+                }
+
+                userFind = await getUserByEmail(emailBusquedaLower);
+                if (!userFind) return Swal.showValidationMessage(`El usuario no existe.`);
+                userFind = [...userFind][0];
+
                 await saveAmigo(userFind[1], usuarioSesion);
+                usuarios.push(userFind);
                 setAmigosState(amigosState => [...amigosState, userFind]);
                 return userFind;
             } catch (error) {

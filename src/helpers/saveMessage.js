@@ -3,8 +3,7 @@ import Swal from 'sweetalert2';
 import { v4 as uuid } from 'uuid'
 
 const db = getDatabase();
-
-export const saveMessage = async (usuarioSesionUid, uidChat, pathMessages, inputRef) => {
+export const saveMessage = async (usuarioSesionUid, uidChat, pathMessages, audio, InputSendMessage, setInputSendMessage) => {
     try {
         const fecha = new Date().getTime();
         const newUuid = uuid();
@@ -13,14 +12,15 @@ export const saveMessage = async (usuarioSesionUid, uidChat, pathMessages, input
             uid: usuarioSesionUid,
             uidTo: uidChat,
             uidUnico: newUuid,
-            mensaje: inputRef.current.value,
+            mensaje: audio || InputSendMessage,
+            type: audio ? 'audio' : 'text',
             fecha: fecha,
         };
         const chatRef = ref(db, `chat/${pathMessages}`);
-        inputRef.current.value = '';
+        if (!audio) setInputSendMessage('');
         await push(chatRef, postData);
     } catch (error) {
         Swal.fire('Ups', 'No se pudo enviar el mensaje, por favor inténtalo de nuevo más tarde.', 'warning');
-        console.log(error);
+        console.error(error);
     }
 }

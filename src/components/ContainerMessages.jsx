@@ -1,6 +1,7 @@
-import { format } from "@formkit/tempo"
 import { memo, useEffect, useRef, useState } from "react"
-import { getFullMessage, getMessagesByPathQuery, suscribeMessage } from "@helpers";
+import { getFullMessage, getMessagesByPathQuery, getMessagesAtTimeNow, suscribeMessage, getMessages } from "@helpers";
+import { userStore } from "@store/userStore";
+import { Message } from "./Message";
 
 let isNuevoChatOMsgScroll = true;
 let heighPosicionChat = 0;
@@ -8,8 +9,9 @@ let isAnimacionMensaje = false;
 const fechaActual = new Date();
 
 export const ContainerMessages = memo(({
-  usuarioSesionUid, pathMessages, setPathMessages, uidChat, loading, setLoading
+  usuarioSesionUid, uidChat, loading
 }) => {
+  const { pathStore, setPath } = userStore();
 
   const chatStartRef = useRef();
   const chatEndRef = useRef();
@@ -17,43 +19,55 @@ export const ContainerMessages = memo(({
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState(null);
 
+
   // Al seleccionar un nuevo chat
   useEffect(() => {
+    setPosts([]);
     if (!uidChat) return;
 
+    let unsubscribe = null;
     isNuevoChatOMsgScroll = true;
     isAnimacionMensaje = false;
     const [uidChat1, uidChat2] = [uidChat, usuarioSesionUid].sort();
-    setPathMessages(`${uidChat1}/${uidChat2}`);
-    setPosts([]);
-    setPagination(null);
+
+    const newPath = `${uidChat1}/${uidChat2}`;
+
+    (async () => {
+      const postsRef = getMessagesByPathQuery(newPath);
+      const responseMessages = await getMessages(postsRef);
+      const responseVal = responseMessages.val();
+      let responseArray = responseVal ? Object.entries(responseVal) : [];
+      setPosts(responseArray);
+      setPath(newPath);
+      setPagination(null);
+      unsubscribe = listenerUserMessages(newPath);
+    })();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    }
   }, [uidChat]);
 
   // Listener en tiempo real para mensaje y consulta inicial
-  useEffect(() => {
-    if (!pathMessages) return;
-    setLoading(true);
-    const postsRef = getMessagesByPathQuery(pathMessages);
-    const unsubscribe = suscribeMessage(postsRef, snapshot => {
+  const listenerUserMessages = (path) => {
+    const postRefRealTime = getMessagesAtTimeNow(path);
+    return suscribeMessage(postRefRealTime, snapshot => {
       const newMessage = snapshot.val();
       const messageDate = new Date(newMessage.fecha);
-      if (messageDate > fechaActual ) {
+      if (messageDate > fechaActual) {
         isAnimacionMensaje = true;
       }
       isNuevoChatOMsgScroll = true;
       const arraySet = [[uidChat, newMessage]];
       setPosts(postsData => [...postsData, ...arraySet]);
     });
-    setLoading(false)
+  }
 
-    return () => unsubscribe();
-  }, [pathMessages]);
 
   // Consulta de mensajes al subir el scroll a 0
   useEffect(() => {
     if (!pagination) return;
     (async () => {
-      const { response } = await getFullMessage(pathMessages, pagination);
+      const { response } = await getFullMessage(pathStore, pagination);
       if (!response) return;
 
       // ordena por fecha
@@ -63,30 +77,26 @@ export const ContainerMessages = memo(({
     })();
   }, [pagination]);
 
-  // Mueve el scroll a la parte de abajo cuando se consultan los mensajes al seleccionar un nuevo chat
+  // Eventos del scroll
   useEffect(() => {
-    if (posts.length && isNuevoChatOMsgScroll) {
+    if (!posts.length || loading) return;
+    // Mueve el scroll a la parte de abajo cuando se consultan los mensajes al seleccionar un nuevo chat
+    if (isNuevoChatOMsgScroll) {
       chatEndRef.current.scrollIntoView({
         block: 'end',
       });
       isNuevoChatOMsgScroll = false;
+
+      // Cuando el scroll está en la posición 0 y se cargan nuevos mensajes
+    } else if (chatStartRef.current && heighPosicionChat) {
+      const { scrollHeight } = chatStartRef.current;
+      const nuevPosScroll = scrollHeight - heighPosicionChat
+      chatStartRef.current.scrollTo({
+        top: nuevPosScroll
+      });
     }
-  }, [posts])
 
-  // Cuando el scroll está en la posición 0 y se cargan nuevos mensajes
-  useEffect(() => {
-    if (!posts.length || !chatStartRef.current || !heighPosicionChat || loading) return;
-    const { scrollHeight } = chatStartRef.current;
-    const nuevPosScroll = scrollHeight - heighPosicionChat
-    chatStartRef.current.scrollTo({
-      top: nuevPosScroll
-    });
-
-  }, [posts]);
-
-  // Evento para cuando se mueve el scroll
-  useEffect(() => {
-    if (!uidChat || !posts.length || loading) return;
+    // Evento para cuando se mueve el scroll
     const container = chatStartRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll);
@@ -97,7 +107,7 @@ export const ContainerMessages = memo(({
         container.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [posts]);
+  }, [posts])
 
   const handleScroll = () => {
     if (!posts.length) return;
@@ -115,27 +125,14 @@ export const ContainerMessages = memo(({
       <div className="mt-24 ml-4 mr-4">
         {
           posts.map(([_, postContent], index) => (
-            <div
+            <Message
               key={postContent.uidUnico}
-              className={`shadow-sm mb-3 rounded-lg p-4
-                ${postContent.uid === usuarioSesionUid
-                  ? 'bg-gray-600 text-white ml-auto'
-                  : 'bg-gray-100 text-gray-800 mr-auto'
-                }
-                ${ index === (posts.length - 1) && isAnimacionMensaje ? 'animate-growFromBottom' : ''}
-              `}
-              style={{
-                maxWidth: "80%",
-              }}
-            >
-              <div className="flex justify-between items-center">
-                <p className="text-sm flex-grow">{postContent.mensaje}</p>
-                <small className={`${postContent.uid === usuarioSesionUid
-                  ? 'text-white'
-                  : 'text-gray-500'
-                  }`}>{format(new Date(postContent.fecha), { date: "short", time: "medium" })}</small>
-              </div>
-            </div>
+              usuarioSesionUid={usuarioSesionUid}
+              posts={posts}
+              postContent={postContent}
+              index={index}
+              isAnimacionMensaje={isAnimacionMensaje}
+            />
           ))
         }
       </div>
