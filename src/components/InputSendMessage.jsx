@@ -26,6 +26,7 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
     };
 
     const handleNewPost = async (event, audio) => {
+        // TODO: VALIDAR PQ SE RECARGA
         if (event) event.preventDefault();
         if (!audio && !InputMessage) return;
         saveMessage(usuarioSesionUid, uidChat, pathStore, audio, InputMessage, setInputMessage);

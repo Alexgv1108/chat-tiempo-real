@@ -1,4 +1,6 @@
 import { format } from "@formkit/tempo"
+import { faPaperPlane, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 
@@ -13,11 +15,11 @@ export const Message = ({ postContent, usuarioSesionUid, posts, index, isAnimaci
         if (postContent.type === 'audio' && waveformRef.current) {
             const wave = WaveSurfer.create({
                 container: waveformRef.current,
-                waveColor: 'blue',
-                progressColor: 'green',
-                cursorColor: 'navy',
+                waveColor: 'navy',
+                progressColor: 'blue',
+                cursorColor: 'purple',
                 barWidth: 3,
-                height: 40,
+                height: 50,
                 normalize: true,
                 responsive: true,
             });
@@ -78,16 +80,22 @@ export const Message = ({ postContent, usuarioSesionUid, posts, index, isAnimaci
             <div className="flex justify-between items-center">
                 {
                     postContent.type === 'audio'
-                        ? <div className="mt-4 w-full">
+                        ? <div className="mt-4 w-full flex items-center">
                             {/* Aquí se mostrará la onda */}
-                            <div ref={waveformRef} className="w-full"></div>
-                            {/* Botones de Play/Pause */}
-                            <div className="flex justify-center mt-4">
+                            <div ref={waveformRef} className="w-[90%]"></div>
+
+                            {/* Contenedor para los controles de audio y el ícono de enviar */}
+                            <div className="flex items-center ml-4">
+                                {/* Botón de Play/Pause */}
                                 <button
                                     onClick={togglePlayPause}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                                    className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 shadow-lg"
                                 >
-                                    {isPlaying ? 'Pause' : 'Play'}
+                                    
+                                    {isPlaying 
+                                        ? <FontAwesomeIcon icon={faStop} /> 
+                                        : <FontAwesomeIcon icon={faPlay} />
+                                    }
                                 </button>
                             </div>
                         </div>
