@@ -23,7 +23,7 @@ export const User = ({ amigoMap, uidChat, ahora, setUidChat, setShowUsers }) => 
                     <p className="text-gray-700 text-left">{amigoMap.email}</p>
                     <small className="text-gray-700 text-left block">{amigoMap.displayName}</small>
                 </div>
-                <div className="flex items-center ml-auto"> {/* Este contenedor mantiene los íconos a la derecha */}
+                <div className="flex items-center ml-auto">
                     {
                         amigoMap.stateSession === STATES_SESSION.LOGIN && diffMinutesUser(amigoMap.lastLogin, TIME_TIME_OUT)
                             ? <div className="w-3 h-3 bg-green-500 rounded-full"></div>
