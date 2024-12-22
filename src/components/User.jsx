@@ -1,7 +1,10 @@
 import { diffMilliseconds, format } from '@formkit/tempo';
 import { STATES_SESSION, TIME_TIME_OUT } from '@global/constantes';
+import { userStore } from '@store/userStore';
 
-export const User = ({ amigoMap, uidChat, ahora, setUidChat, setShowUsers }) => {
+export const User = ({ amigoMap, uidChat, ahora, setUidChat }) => {
+
+    const { setShowUsers } = userStore();
 
     const handleChatear = uid => {
         if (uid === uidChat) return;
@@ -33,12 +36,12 @@ export const User = ({ amigoMap, uidChat, ahora, setUidChat, setShowUsers }) => 
                     }
                 </div>
             </li>
-            {amigoMap.stateSession !== STATES_SESSION.LOGIN && (
+            {(amigoMap.stateSession !== STATES_SESSION.LOGIN || !diffMinutesUser(amigoMap.lastLogin, TIME_TIME_OUT)) && (
                 <div className="mt-1 text-xs text-gray-600 ml-2">
-                    Última conexión: 
-                    {format(new Date(amigoMap.lastLogin), { date: "short", time: "medium" })}    
+                    Última conexión:
+                    {format(new Date(amigoMap.lastLogin), { date: "short", time: "medium" })}
                 </div>
-  )}
+            )}
         </div>
     )
 }

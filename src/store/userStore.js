@@ -2,7 +2,7 @@ import { create } from "zustand"
 
 export const userStore = create((set) => ({
   pathStore: null,
-  friendStore: null,
+  showUsers: false,
   setPath: (newPath) => set({ pathStore: newPath }),
-  setFriend: (friends) => set({ friendStore: friends }),
+  setShowUsers: (isShowUser) => set({ showUsers: isShowUser }),
 }))

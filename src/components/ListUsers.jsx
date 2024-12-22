@@ -9,17 +9,22 @@ import { addFriend } from "../utils/swal/addFriend";
 import { suscribeUsers } from "../helpers/suscribeUsers";
 import { off } from "firebase/database";
 import { User } from "./User";
+import {AmigoSkeleton} from '../skeleton/UserSkeleton';
+import { userStore } from "@store/userStore";
 
 const ahora = new Date();
 const usuarios = [];
 
-export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat, setShowUsers }) => {
+export const ListUsers = memo(({ usuarioSesion, uidChat, setUidChat }) => {
     const [amigosState, setAmigosState] = useState([]);
+    const [userLoading, setUserLoading] = useState(false);
+
+    const { showUsers, setShowUsers } = userStore();
 
     // Consulta información de los amigos en sesión
     useEffect(() => {
         (async () => {
-            setLoading(true);
+            setUserLoading(true);
             const amigos = await getAmigos(usuarioSesion.uid);
             for (const [_, userInfo] of amigos) {
                 let amigoMap = usuarios.find(([_, usuarioItem]) => userInfo.uid === usuarioItem.uid);
@@ -33,7 +38,7 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
                 }
             }
             setAmigosState([...usuarios]);
-            setLoading(false);
+            setUserLoading(false);
         })();
     }, []);
 
@@ -64,7 +69,7 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
     }, [amigosState])
 
     const handleShowUser = () => {
-        setShowUsers(showUsers => !showUsers);
+        setShowUsers(!showUsers);
     }
 
     const handleSalirChat = () => {
@@ -91,7 +96,7 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
                     </button>
                 </div>)
             }
-            <div className="rounded overflow-hidden shadow-lg bg-white h-screen overflow-y-auto">
+            <div className="rounded overflow-hidden shadow-lg h-screen overflow-y-auto">
                 <div className="ml-2 mr-2 mt-16">
                     <h5 className="font-bold text-xl mb-2 mt-5">Usuarios</h5>
                     <div className="flex justify-end mb-3">
@@ -101,16 +106,19 @@ export const ListUsers = memo(({ usuarioSesion, setLoading, uidChat, setUidChat,
                     </div>
                     <ul className="flex-grow overflow-auto">
                         {
-                            amigosState.map(([uidUnico, amigoMap]) => (
-                                <User
-                                    key={uidUnico}
-                                    amigoMap={amigoMap}
-                                    uidChat={uidChat}
-                                    ahora={ahora}
-                                    setUidChat={setUidChat}
-                                    setShowUsers={setShowUsers}
-                                />
-                            ))
+                            userLoading 
+                                ? <AmigoSkeleton /> 
+                                : (
+                                    amigosState.map(([uidUnico, amigoMap]) => (
+                                        <User
+                                            key={uidUnico}
+                                            amigoMap={amigoMap}
+                                            uidChat={uidChat}
+                                            ahora={ahora}
+                                            setUidChat={setUidChat}
+                                        />
+                                    ))
+                                )
                         }
                     </ul>
                 </div>
