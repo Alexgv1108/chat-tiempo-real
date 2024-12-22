@@ -13,6 +13,7 @@
     "@formkit/tempo": "^0.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "emoji-picker-react": "^4.12.0",
     "firebase": "^11.1.0",
     "react": "^19.0.0",
     "react-device-detect": "^2.2.3",
