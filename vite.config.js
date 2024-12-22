@@ -1,9 +1,32 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vite.dev/config/
+
+const manifestForPlugIn = {
+  registerType: 'autoUpdate',
+  manifest: {
+    name: 'Chat en tiempo real',
+    short_name: 'Chat realtime',
+    description: 'Chat en tiempo real usando React, vite y firebase',
+    theme_color: '#ffffff',
+    background_color: '#ffffff',
+    display: 'standalone',
+    orientation: 'portrait',
+    scope: '/',
+    start_url: "/",
+    icons: [
+      {
+        src: 'src/assets/chat-icon.jpg',
+        sizes: '360x360',
+        type: 'image/png',
+      }
+    ],
+  },
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), VitePWA(manifestForPlugIn)],
   resolve: {
     alias: {
       '@pages': '/src/pages',
@@ -14,5 +37,5 @@ export default defineConfig({
       '@global': '/src/global',
       '@store': '/src/store',
     },
-  }
+  },
 })

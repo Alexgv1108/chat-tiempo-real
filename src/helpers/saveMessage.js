@@ -12,12 +12,12 @@ export const saveMessage = async (usuarioSesionUid, uidChat, pathMessages, audio
             uid: usuarioSesionUid,
             uidTo: uidChat,
             uidUnico: newUuid,
-            mensaje: audio || InputSendMessage,
-            type: audio ? 'audio' : 'text',
+            mensaje: InputSendMessage || audio,
+            type: InputSendMessage ? 'text' : 'audio',
             fecha: fecha,
         };
         const chatRef = ref(db, `chat/${pathMessages}`);
-        if (!audio) setInputSendMessage('');
+        if (InputSendMessage) setInputSendMessage('');
         await push(chatRef, postData);
     } catch (error) {
         Swal.fire('Ups', 'No se pudo enviar el mensaje, por favor inténtalo de nuevo más tarde.', 'warning');
