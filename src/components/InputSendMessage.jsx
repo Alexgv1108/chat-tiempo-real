@@ -10,6 +10,18 @@ import { faFaceSmileBeam } from '@fortawesome/free-solid-svg-icons/faFaceSmileBe
 
 let mediaRecorder = false;
 let audioChunks = [];
+
+function escapeRegex(texto) {
+    return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Preprocesamos las expresiones regulares para los emojis una vez
+const emojiRegexMap = Object.keys(DICCIONARIO_EMOJIS).reduce((map, key) => {
+    const regex = new RegExp(escapeRegex(key), 'g');
+    map[key] = regex;
+    return map;
+}, {});
+
 export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
 
     const { pathStore } = userStore();
@@ -32,11 +44,6 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
         setEmoji(false);
     }
 
-
-    function escapeRegex(texto) {
-        return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
     const handleInputChange = (event) => {
         const valueWithEmoji = reemplazoEmojiDinamico(event.target.value);
         setInputMessage(valueWithEmoji);
@@ -53,14 +60,12 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
     }
 
     const reemplazoEmojiDinamico = (input) => {
-        // Reemplazo dinámico
         let messageWithEmoji = input;
-        for (let clave in DICCIONARIO_EMOJIS) {
-            let regex = new RegExp(escapeRegex(clave), "g");
-            messageWithEmoji = messageWithEmoji.replace(regex, DICCIONARIO_EMOJIS[clave]);
+        for (let clave in emojiRegexMap) {
+            messageWithEmoji = messageWithEmoji.replace(emojiRegexMap[clave], DICCIONARIO_EMOJIS[clave]);
         }
         return messageWithEmoji;
-    }
+    };
 
     // Función para iniciar la grabación
     const startRecording = async () => {
