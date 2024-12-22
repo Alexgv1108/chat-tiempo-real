@@ -2,22 +2,22 @@ import { memo, useEffect, useRef, useState } from "react"
 import { getFullMessage, getMessagesByPathQuery, getMessagesAtTimeNow, suscribeMessage, getMessages } from "@helpers";
 import { userStore } from "@store/userStore";
 import { Message } from "./Message";
+import { MessageSkeleton } from "../skeleton/MessageSkeleton";
 
 let isNuevoChatOMsgScroll = true;
 let heighPosicionChat = 0;
 let isAnimacionMensaje = false;
 const fechaActual = new Date();
 
-export const ContainerMessages = memo(({
-  usuarioSesionUid, uidChat, loading
-}) => {
+export const ContainerMessages = memo(({ usuarioSesionUid, uidChat }) => {
   const { pathStore, setPath } = userStore();
+
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [pagination, setPagination] = useState(null);
 
   const chatStartRef = useRef();
   const chatEndRef = useRef();
-
-  const [posts, setPosts] = useState([]);
-  const [pagination, setPagination] = useState(null);
 
 
   // Al seleccionar un nuevo chat
@@ -25,6 +25,7 @@ export const ContainerMessages = memo(({
     setPosts([]);
     if (!uidChat) return;
 
+    setIsLoadingMessages(true);
     let unsubscribe = null;
     isNuevoChatOMsgScroll = true;
     isAnimacionMensaje = false;
@@ -41,6 +42,7 @@ export const ContainerMessages = memo(({
       setPath(newPath);
       setPagination(null);
       unsubscribe = listenerUserMessages(newPath);
+      setIsLoadingMessages(false);
     })();
     return () => {
       if (unsubscribe) unsubscribe();
@@ -79,7 +81,7 @@ export const ContainerMessages = memo(({
 
   // Eventos del scroll
   useEffect(() => {
-    if (!posts.length || loading) return;
+    if (!posts.length || isLoadingMessages) return;
     // Mueve el scroll a la parte de abajo cuando se consultan los mensajes al seleccionar un nuevo chat
     if (isNuevoChatOMsgScroll) {
       chatEndRef.current.scrollIntoView({
@@ -107,7 +109,7 @@ export const ContainerMessages = memo(({
         container.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [posts])
+  }, [posts]);
 
   const handleScroll = () => {
     if (!posts.length) return;
@@ -124,19 +126,24 @@ export const ContainerMessages = memo(({
     <div className="flex-grow overflow-auto" ref={chatStartRef}>
       <div className="mt-24 ml-4 mr-4">
         {
-          posts.map(([_, postContent], index) => (
-            <Message
-              key={postContent.uidUnico}
-              usuarioSesionUid={usuarioSesionUid}
-              posts={posts}
-              postContent={postContent}
-              index={index}
-              isAnimacionMensaje={isAnimacionMensaje}
-            />
-          ))
+          isLoadingMessages 
+            ? <MessageSkeleton />
+            : (
+              posts.map(([_, postContent], index) => (
+                <Message
+                  key={postContent.uidUnico}
+                  usuarioSesionUid={usuarioSesionUid}
+                  posts={posts}
+                  postContent={postContent}
+                  index={index}
+                  isAnimacionMensaje={isAnimacionMensaje}
+                />
+              ))
+            )
         }
       </div>
-      <div ref={chatEndRef} />
+
+      < div ref={chatEndRef} />
     </div>
   )
 })
