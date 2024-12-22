@@ -5,6 +5,8 @@ import { DICCIONARIO_EMOJIS } from '@global/constantes';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faPaperPlane, faStop } from '@fortawesome/free-solid-svg-icons';
+import EmojiPicker from 'emoji-picker-react';
+import { faFaceSmileBeam } from '@fortawesome/free-solid-svg-icons/faFaceSmileBeam';
 
 let mediaRecorder = false;
 let audioChunks = [];
@@ -15,6 +17,20 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
     const [InputMessage, setInputMessage] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const [record, setRecord] = useState(false);
+
+    const [emoji, setEmoji] = useState("");
+
+    const handleEmojiSelect = (e) => {
+        setInputMessage(`${InputMessage}${e.emoji}`)
+    };
+
+    const togglePicker = () => {
+        setEmoji(!emoji);
+    }
+
+    const closePicker = () => {
+        setEmoji(false);
+    }
 
 
     function escapeRegex(texto) {
@@ -64,23 +80,15 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
 
     // Función para detener la grabación
     const stopRecording = () => {
-        mediaRecorder.stop();
-        setIsRecording(false);
-
-        mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const base64Audio = await blobToBase64(audioBlob);
-            setRecord(base64Audio);
-        };
-        if (mediaRecorder) {
-        }
-    };
-
-    const onStop = async (recordedBlob) => {
         try {
-            const blob = recordedBlob instanceof Blob ? recordedBlob : recordedBlob.blob;
-            const base64Audio = await blobToBase64(blob);
-            setRecord(base64Audio);
+            mediaRecorder.stop();
+            setIsRecording(false);
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const base64Audio = await blobToBase64(audioBlob);
+                setRecord(base64Audio);
+            };
         } catch (error) {
             console.error('Error al convertir el Blob a Base64:', error);
             Swal.fire('No se pudo enviar el audio', 'Por favor, intente de nuevo más tarde', 'warning');
@@ -106,6 +114,23 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
         uidChat && (
             <>
                 <form className="bottom-0 left-0 w-full p-4 bg-white shadow-md flex items-center" name='input-submit-message' onSubmit={handleOnSubmitForm}>
+                    {
+                        <div className="absolute bottom-0 lef-0 p-2 z-10 mb-16 ml-6">
+                            <EmojiPicker
+                                open={emoji}
+                                onEmojiClick={handleEmojiSelect}
+                            />
+                        </div>
+                    }
+
+                    <button
+                        type="button"
+                        className="text-2xl mr-2 text-yellow-500 hover:text-yellow-600"
+                        onClick={togglePicker}
+                    >
+                        <FontAwesomeIcon icon={faFaceSmileBeam} />
+                    </button>
+
                     <input
                         name='text-message'
                         autoComplete='off'
@@ -115,6 +140,7 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
                         aria-label="Escribe un mensaje"
                         value={InputMessage}
                         onChange={handleInputChange}
+                        onFocus={closePicker}
                         disabled={isRecording}
                     />
                     <button
