@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
-import { Loader } from "@components";
 import { Chat } from "@pages/chat/Chat"
 import { validateSession } from "@utils/validateSession";
 import { useEffect, useState } from "react";
@@ -30,13 +29,11 @@ export const AppRouterPrivate = () => {
     // RENDERIZADO DEL PRIVATE
 
     return !usuarioSesion
-        ? (<Loader />)
-        : (
-            <Routes>
-                <Route path="/" element={<Chat usuarioSesion={usuarioSesion} />} />
-                <Route path="/*" element={<Navigate to="/" />} />
-            </Routes>
-        )
+        ? <></>
+        : <Routes>
+            <Route path="/" element={<Chat usuarioSesion={usuarioSesion} />} />
+            <Route path="/*" element={<Navigate to="/" />} />
+        </Routes>
 
 
 }

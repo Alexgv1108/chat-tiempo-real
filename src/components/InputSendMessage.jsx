@@ -5,8 +5,9 @@ import { DICCIONARIO_EMOJIS } from '@global/constantes';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faPaperPlane, faStop } from '@fortawesome/free-solid-svg-icons';
-import { ReactMic } from 'react-mic';
 
+let mediaRecorder = false;
+let audioChunks = [];
 export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
 
     const { pathStore } = userStore();
@@ -25,11 +26,14 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
         setInputMessage(valueWithEmoji);
     };
 
-    const handleNewPost = async (event, audio) => {
-        // TODO: VALIDAR PQ SE RECARGA
-        if (event) event.preventDefault();
+    const handleNewPost = async (audio) => {
         if (!audio && !InputMessage) return;
         saveMessage(usuarioSesionUid, uidChat, pathStore, audio, InputMessage, setInputMessage);
+    }
+
+    const handleOnSubmitForm = async (event) => {
+        event.preventDefault();
+        handleNewPost();
     }
 
     const reemplazoEmojiDinamico = (input) => {
@@ -45,28 +49,41 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
     // Función para iniciar la grabación
     const startRecording = async () => {
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+            mediaRecorder.start();
             setIsRecording(true);
         } catch (error) {
-            Swal.fire('Micrófono', 'No tienes un micrófono para grabar...', 'warning')
+            Swal.fire('Micrófono', 'No tienes un micrófono para grabar.', 'warning')
         }
     };
 
     // Función para detener la grabación
     const stopRecording = () => {
+        mediaRecorder.stop();
         setIsRecording(false);
+
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const base64Audio = await blobToBase64(audioBlob);
+            setRecord(base64Audio);
+        };
+        if (mediaRecorder) {
+        }
     };
 
-    // Guardar el archivo de audio una vez terminado
     const onStop = async (recordedBlob) => {
         try {
-            // Convertir el Blob a Base64
-            const response = await fetch(recordedBlob.blobURL);
-            const blob = await response.blob();
+            const blob = recordedBlob instanceof Blob ? recordedBlob : recordedBlob.blob;
             const base64Audio = await blobToBase64(blob);
             setRecord(base64Audio);
         } catch (error) {
-            Swal.fire('No se pudo enviar el audio', 'Por favor, intente de nuevo más tarde', 'warning')
+            console.error('Error al convertir el Blob a Base64:', error);
+            Swal.fire('No se pudo enviar el audio', 'Por favor, intente de nuevo más tarde', 'warning');
         }
     };
 
@@ -81,22 +98,14 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
 
     useEffect(() => {
         if (!record) return;
-        handleNewPost(null, record);
+        handleNewPost(record);
     }, [record])
 
 
     return (
         uidChat && (
             <>
-                {
-                    <ReactMic
-                        record={isRecording}
-                        onStop={onStop}
-                        mimeType="audio/mp3"
-                        className="hidden"
-                    />
-                }
-                <form className="bottom-0 left-0 w-full p-4 bg-white shadow-md flex items-center" name='input-submit-message'>
+                <form className="bottom-0 left-0 w-full p-4 bg-white shadow-md flex items-center" name='input-submit-message' onSubmit={handleOnSubmitForm}>
                     <input
                         name='text-message'
                         autoComplete='off'
@@ -106,6 +115,7 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
                         aria-label="Escribe un mensaje"
                         value={InputMessage}
                         onChange={handleInputChange}
+                        disabled={isRecording}
                     />
                     <button
                         className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 shadow-lg"
