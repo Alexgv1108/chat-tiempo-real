@@ -1,15 +1,10 @@
+import { memo} from "react";
 import { format } from "@formkit/tempo"
-import { faLessThanEqual, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { memo, useEffect, useRef, useState } from "react";
-import WaveSurfer from "wavesurfer.js";
 import { AudioMessage } from "./AudioMessage";
 
 const areEqual = (prevProps, nextProps) => {
     return prevProps.postContent.uidUnico === nextProps.postContent.uidUnico;
 };
-
-let waveform = null;
 
 export const Message = memo(({ postContent, usuarioSesionUid, posts, index, isAnimacionMensaje }) => {
     return (
