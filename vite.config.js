@@ -5,6 +5,21 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 const manifestForPlugIn = {
   registerType: 'autoUpdate',
+  workbox: {
+    runtimeCaching: [
+      {
+        urlPattern: /.*\.(?:js|css|html|json)/,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'assets-cache',
+          expiration: {
+            maxEntries: 80,
+            maxAgeSeconds: 86400,
+          },
+        },
+      },
+    ],
+  },
   manifest: {
     name: 'Chat en tiempo real',
     short_name: 'Chat realtime',
@@ -13,8 +28,7 @@ const manifestForPlugIn = {
     background_color: '#ffffff',
     display: 'standalone',
     orientation: 'portrait',
-    scope: '/',
-    start_url: "/",
+    start_url: ".",
     icons: [
       {
         src: 'src/assets/chat-icon.jpg',
