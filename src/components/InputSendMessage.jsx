@@ -9,6 +9,7 @@ import EmojiPicker from 'emoji-picker-react';
 
 let mediaRecorder = null;
 let audioChunks = [];
+let audioStream = null;
 
 const escapeRegex = (texto) => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -50,14 +51,17 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
     // Función para iniciar la grabación
     const startRecording = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (mediaRecorder) mediaRecorder.stop();
+            mediaRecorder = new MediaRecorder(audioStream);
             audioChunks = [];
             mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
             mediaRecorder.start();
             setIsRecording(true);
+
         } catch {
             Swal.fire('Micrófono', 'No tienes un micrófono para grabar.', 'warning');
+            setIsRecording(false);
         }
     };
 
@@ -67,13 +71,19 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
         mediaRecorder.stop();
         setIsRecording(false);
 
+        // Detenemos el stream de audio
+        if (audioStream) {
+            const tracks = audioStream.getTracks();
+            tracks.forEach(track => track.stop());
+        }
+
         mediaRecorder.onstop = async () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             const base64Audio = await blobToBase64(audioBlob);
             setRecord(base64Audio);
         };
     };
-
+    
     const blobToBase64 = (blob) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -82,6 +92,15 @@ export const InputSendMessage = memo(({ usuarioSesionUid, uidChat }) => {
             reader.readAsDataURL(blob);
         });
     };
+
+    // Limpiar recursos cuando el componente se desmonta
+    useEffect(() => {
+        return () => {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (record) handleNewPost(record);
