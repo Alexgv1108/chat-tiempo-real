@@ -12,7 +12,7 @@ export const Chat = ({ usuarioSesion }) => {
     // Listener para cuando se mueve el mouse, gestiona el estado en sesión
     stateSesionUser(usuarioSesion);
 
-    // TODO VOLVER PWA INSTALABLE
+    // toDo: mostrar ventana sin conexión...
     return (
         <>
             <Navbar
