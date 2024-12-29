@@ -24,36 +24,45 @@ export const Login = () => {
     return () => unsubscribeAuth();
   }, []);
 
-  const loginWithGoogle = async (event) => {
+  const handleLoginWithGoogle = async (event) => {
     event.preventDefault();
     isLoginPending = true;
-    const { isLogin } = await popUpLoginWithGoogle();
-    if (isLogin) navigate('/chat');
-    else {
-      Swal.fire('ups', 'No has iniciado sesión de forma correcta.');
+
+    try {
+      const { isLogin } = await popUpLoginWithGoogle();
+      if (isLogin) {
+        navigate('/chat');
+      } else {
+        Swal.fire('Ups', 'No has iniciado sesión de forma correcta.', 'error');
+        isLoginPending = false;
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Algo salió mal al iniciar sesión. Por favor, inténtalo de nuevo.', 'error');
       isLoginPending = false;
     }
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-sm">
-        <div className="bg-white shadow-lg rounded-lg mb-2">
-          <div className="p-4">
-            <h5 className="text-center text-xl font-semibold">Chat en tiempo Real</h5>
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="p-6">
+            <h1 className="text-2xl font-semibold text-center mb-4 text-gray-700">
+              Chat en Tiempo Real
+            </h1>
             <button
-              type="submit"
-              className="w-full mt-2 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              onClick={loginWithGoogle}
+              type="button"
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition"
+              onClick={handleLoginWithGoogle}
             >
               Iniciar sesión con Google
             </button>
           </div>
         </div>
-        <p className="text-center text-gray-500 text-sm mt-2">
-          Autor: Alexander Gallego Vasquez
+        <p className="text-center text-gray-500 text-sm mt-4">
+          Autor: <span className="font-medium">Alexander Gallego Vasquez</span>
         </p>
       </div>
     </div>
-  )
+  );
 }
