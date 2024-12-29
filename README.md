@@ -56,6 +56,7 @@ La aplicación está alojada en Netlify y se puede acceder a través de la sigui
 
 2. Instala las dependencias
 3. Configura Firebase en tu archivo .env:
+```javascript
     VITE_FIREBASE_API_KEY=tu_api_key
     VITE_FIREBASE_AUTH_DOMAIN=tu_auth_domain
     VITE_FIREBASE_DATABASE_URL=tu_database_url
@@ -64,5 +65,6 @@ La aplicación está alojada en Netlify y se puede acceder a través de la sigui
     VITE_FIREBASE_MESSAGING_SENDER_ID=tu_messaging_sender_id
     VITE_FIREBASE_APP_ID=tu_app_id
     VITE_FIREBASE_MEASUREMENT_ID=tu_measurement_id
+```
 
 4. Ejecuta el proyecto
