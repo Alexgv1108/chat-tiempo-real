@@ -4,15 +4,15 @@ import { getAuth } from "firebase/auth";
 
 // Configuración de Firebase usando variables de entorno
 const firebaseConfig = {
-    apiKey: "AIzaSyDaWRFG9B2w1hnqlMJl6zSQmkTAs_xTX60",
-    authDomain: "chat-tiempo-real-16810.firebaseapp.com",
-    databaseURL: "https://chat-tiempo-real-16810-default-rtdb.firebaseio.com",
-    projectId: "chat-tiempo-real-16810",
-    storageBucket: "chat-tiempo-real-16810.firebasestorage.app",
-    messagingSenderId: "1044808692695",
-    appId: "1:1044808692695:web:e6fb1dbd105ab097a5d192",
-    measurementId: "G-8QK1Z7Z315"
-  };
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
 // Initialize Firebase
 const FirebaseApp = initializeApp(firebaseConfig);
